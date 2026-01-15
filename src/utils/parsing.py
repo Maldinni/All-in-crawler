@@ -7,8 +7,8 @@ from typing import Any, Dict
 def load_toml(path: str | Path) -> Dict[str, Any]:
     p = Path(path)
     raw = p.read_bytes()
-    print("[DEBUG] bytes len:", len(raw))
-    print("[DEBUG] first 80 bytes:", raw[:80])
+    #print("[DEBUG] bytes len:", len(raw))
+    #print("[DEBUG] first 80 bytes:", raw[:80])
     with open(p, "rb") as f:
         return tomllib.load(f)
 
@@ -32,11 +32,11 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
     scraping_file = load_toml(args.scraping)
     sources_file = load_toml(args.sources)
 
-    from pathlib import Path
+    #from pathlib import Path
 
-    print("[DEBUG] directories arg:", args.directories)
-    print("[DEBUG] directories abs:", Path(args.directories).resolve())
-    print("[DEBUG] keys in dirs_file:", list(dirs_file.keys()))
+    #print("[DEBUG] directories arg:", args.directories)
+    #print("[DEBUG] directories abs:", Path(args.directories).resolve())
+    #print("[DEBUG] keys in dirs_file:", list(dirs_file.keys()))
 
 
     cfg = {

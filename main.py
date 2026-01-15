@@ -4,7 +4,7 @@ from src.utils.parsing import parse_args, load_config
 from src.utils.checkpoints import load_processed_urls, save_processed_urls
 from src.utils.discovery import discover_article_urls_listing
 from src.utils.extraction import extract_with_retry
-from src.utils.io import ensure_dirs, determine_output_filename, append_jsonl
+from src.utils.io import ensure_dirs, determine_output_filename, append_csv
 
 
 def main():
@@ -39,12 +39,16 @@ def main():
 
         listing_url = source["url"]
         allow_domains = source.get("allow_domains")
-        urls = discover_article_urls_listing(
-            listing_url=listing_url,
-            allow_domains=allow_domains,
-            user_agent=scraping["user_agent"],
-            timeout_sec=int(scraping["timeout_sec"]),
-        )
+        try:
+            urls = discover_article_urls_listing(
+                listing_url=listing_url,
+                allow_domains=allow_domains,
+                user_agent=scraping["user_agent"],
+                timeout_sec=int(scraping["timeout_sec"]),
+            )
+        except Exception as e:
+            print(f"[WARN] Failed to discover URLs for {source['name']}: {e}")
+            continue
 
         # limita por fonte
         urls = urls[: int(scraping["max_articles_per_source"])]
@@ -60,7 +64,14 @@ def main():
                 processed.add(url)
                 continue
 
-            data = extract_with_retry(url, int(scraping["num_attempts"]), float(scraping["sleep_time"]))
+            data = extract_with_retry(
+                url,
+                source["name"],
+                scraping["user_agent"],
+                int(scraping["num_attempts"]),
+                float(scraping["sleep_time"])
+            )
+
 
             # se falhar, marca como processado ou não? (decisão)
             # no protótipo, eu NÃO marcaria como processado se falhou
@@ -73,7 +84,7 @@ def main():
             processed.add(url)
 
             if len(buffer) >= items_per_shard:
-                append_jsonl(output_file, buffer)
+                append_csv(output_file, buffer)
                 save_processed_urls(processed_path, processed)
                 buffer = []
                 output_file, shard_id = determine_output_filename(paths["output"], ext=sharding.get("format", "jsonl"))
@@ -84,7 +95,7 @@ def main():
         save_processed_urls(processed_path, processed)
 
     if buffer and not runtime["dry_run"]:
-        append_jsonl(output_file, buffer)
+        append_csv(output_file, buffer)
         save_processed_urls(processed_path, processed)
         print(f"Final flush -> {output_file}")
 

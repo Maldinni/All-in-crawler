@@ -1,0 +1,55 @@
+[[sources]]
+name = "Conecta Piauí"
+type = "listing"
+url = "https://conectapiaui.com.br/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "G1 Piauí"
+type = "listing"
+url = "https://g1.globo.com/pi/piaui/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "G1"
+type = "listing"
+url = "https://g1.globo.com/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "OitoMeia"
+type = "listing"
+url = "https://www.oitomeia.com.br/noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "Portal AZ"
+type = "listing"
+url = "https://www.portalaz.com.br/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "Boletim Brio"
+type = "listing"
+url = "https://boletimbrio.com/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "GP1"
+type = "listing"
+url = "https://www.gp1.com.br/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"
+
+[[sources]]
+name = "Meio Norte"
+type = "listing"
+url = "https://www.meionews.com/ultimas-noticias/"
+article_selector = "a"
+article_url_pattern = "/"

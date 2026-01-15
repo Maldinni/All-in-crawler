@@ -1,45 +1,93 @@
-import nltk
-nltk.download("punkt", quiet=True)
+from time import sleep
 
-# instalar dependências e ambiente conda
+from src.utils.parsing import parse_args, load_config
+from src.utils.checkpoints import load_processed_urls, save_processed_urls
+from src.utils.discovery import discover_article_urls_listing
+from src.utils.extraction import extract_with_retry
+from src.utils.io import ensure_dirs, determine_output_filename, append_jsonl
 
-#Newspaper3k
 
-#180graus erro - 403 forbidden: o site impede os requests do protótipo incial 
-#Conecta Piauí sucesso
-#Meio Norte sucesso
-#Hora Piauí sucesso mas requer atenção - não extrai todos os dados necessários
-#G1 Piauí sucesso
-#G1 sucesso
-#Cidade Verde erro - 403 forbidden: o site impede os requests do protótipo incial 
-#OitoMeia sucesso
-#Portal AZ sucesso
-#Boletim Brio sucesso
-#GP1 sucesso
+def main():
+    args = parse_args()
+    cfg = load_config(args)
 
-from newspaper import Article
+    paths = cfg["paths"]
+    scraping = cfg["scraping"]
+    sources = cfg["sources"]
+    runtime = cfg["runtime"]
+    sharding = cfg["sharding"]
 
-def extract_with_newspaper(url: str, language: str = "pt"):
-    a = Article(url, language=language)
-    a.download()
-    a.parse()
-    # tenta pegar algumas infos extras quando disponíveis
-    a.nlp()
-    return {
-        "url": url,
-        "title": a.title,
-        "authors": a.authors,
-        "publish_date": a.publish_date.isoformat() if a.publish_date else None,
-        "text": a.text,
-        "top_image": a.top_image,
-        "keywords": getattr(a, "keywords", None),
-        "summary": getattr(a, "summary", None),
-    }
+    ensure_dirs(paths["raw"], paths["processed"], paths["checkpoints"], paths["output"])
 
-url = "<URL DA MATERIA>"
-data = extract_with_newspaper(url)
+    processed_path = f'{paths["checkpoints"]}/processed_urls.json'
+    processed = load_processed_urls(processed_path)
 
-print("TITLE:", data["title"])
-print("DATE :", data["publish_date"])
-print("AUTH :", data["authors"])
-print("\nTEXT (preview):\n", data["text"][:800])
+    output_file, shard_id = determine_output_filename(paths["output"], ext=sharding.get("format", "jsonl"))
+    buffer = []
+    items_per_shard = int(sharding.get("items_per_shard", 200))
+
+    # filtra uma fonte, se pedido
+    if runtime["source_filter"]:
+        sources = [s for s in sources if s["name"] == runtime["source_filter"]]
+
+    for source in sources:
+        print(f'\n=== Source: {source["name"]} ({source["type"]}) ===')
+
+        if source["type"] != "listing":
+            print("Protótipo atual só suporta type=listing. Pulando.")
+            continue
+
+        listing_url = source["url"]
+        allow_domains = source.get("allow_domains")
+        urls = discover_article_urls_listing(
+            listing_url=listing_url,
+            allow_domains=allow_domains,
+            user_agent=scraping["user_agent"],
+            timeout_sec=int(scraping["timeout_sec"]),
+        )
+
+        # limita por fonte
+        urls = urls[: int(scraping["max_articles_per_source"])]
+
+        print(f"Discovered URLs: {len(urls)} (limit applied)")
+
+        for url in urls:
+            if url in processed:
+                continue
+
+            if runtime["dry_run"]:
+                print("[dry-run]", url)
+                processed.add(url)
+                continue
+
+            data = extract_with_retry(url, int(scraping["num_attempts"]), float(scraping["sleep_time"]))
+
+            # se falhar, marca como processado ou não? (decisão)
+            # no protótipo, eu NÃO marcaria como processado se falhou
+            if not data or not data.get("text"):
+                continue
+
+            data["source"] = source["name"]
+            buffer.append(data)
+
+            processed.add(url)
+
+            if len(buffer) >= items_per_shard:
+                append_jsonl(output_file, buffer)
+                save_processed_urls(processed_path, processed)
+                buffer = []
+                output_file, shard_id = determine_output_filename(paths["output"], ext=sharding.get("format", "jsonl"))
+                print(f"Flushed shard -> {output_file}")
+
+            sleep(float(scraping["sleep_time"]))
+
+        save_processed_urls(processed_path, processed)
+
+    if buffer and not runtime["dry_run"]:
+        append_jsonl(output_file, buffer)
+        save_processed_urls(processed_path, processed)
+        print(f"Final flush -> {output_file}")
+
+
+if __name__ == "__main__":
+    main()

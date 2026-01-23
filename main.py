@@ -41,10 +41,13 @@ def main():
         allow_domains = source.get("allow_domains")
         try:
             urls = discover_article_urls_listing(
-                listing_url=listing_url,
-                allow_domains=allow_domains,
+                listing_url=source["url"],
+                allow_domains=source.get("allow_domains"),
                 user_agent=scraping["user_agent"],
                 timeout_sec=int(scraping["timeout_sec"]),
+                link_selector=source.get("link_selector", "a[href]"),
+                allow_url_patterns=source.get("allow_url_patterns"),
+                deny_url_patterns=source.get("deny_url_patterns"),
             )
         except Exception as e:
             print(f"[WARN] Failed to discover URLs for {source['name']}: {e}")

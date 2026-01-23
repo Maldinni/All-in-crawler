@@ -11,19 +11,33 @@ def discover_article_urls_listing(
     allow_domains: Optional[List[str]],
     user_agent: str,
     timeout_sec: int,
+    link_selector: str = "a[href]",
+    allow_url_patterns: Optional[List[str]] = None,
+    deny_url_patterns: Optional[List[str]] = None,
 ) -> List[str]:
-    headers = {"User-Agent": user_agent}
+    headers = {
+        "User-Agent": user_agent,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+    }
+
     r = requests.get(listing_url, headers=headers, timeout=timeout_sec)
     r.raise_for_status()
 
     soup = BeautifulSoup(r.text, "html.parser")
 
     urls = []
-    for a in soup.select("a[href]"):
+
+    for a in soup.select(link_selector):
         href = a.get("href", "").strip()
         if not href:
             continue
+
         full = urljoin(listing_url, href)
+
+        host = urlparse(full).netloc.lower()
+        if any(bad in host for bad in ["whatsapp.com", "wa.me", "twitter.com", "t.me", "facebook.com", "instagram.com", "spotify.com"]):
+            continue
 
         # filtra domínios
         if allow_domains:
@@ -31,9 +45,20 @@ def discover_article_urls_listing(
             if not any(netloc.endswith(d) for d in allow_domains):
                 continue
 
-        # heurística: ignora âncoras e coisas óbvias que não são notícia
+        # allow patterns (ex: /noticia/)
+        if allow_url_patterns:
+            if not any(re.search(p, full) for p in allow_url_patterns):
+                continue
+
+        # deny patterns (ex: /tag/, /videos/)
+        if deny_url_patterns:
+            if any(re.search(p, full) for p in deny_url_patterns):
+                continue
+
+        # ignora âncoras
         if "#" in full:
             continue
+
         urls.append(full)
 
     # dedup preservando ordem
@@ -43,4 +68,5 @@ def discover_article_urls_listing(
         if u not in seen:
             out.append(u)
             seen.add(u)
+
     return out

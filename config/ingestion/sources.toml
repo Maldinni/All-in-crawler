@@ -2,54 +2,88 @@
 name = "Conecta Piauí"
 type = "listing"
 url = "https://conectapiaui.com.br/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["conectapiaui.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = [
+  "/institucional/", "/tudo-sobre/", "/tabelas/", "/tv-",
+  "/ultimas-noticias/?", "/ultimas-noticias/?page=",
+  "/ultimas-noticias/?$", "/ultimas-noticias/$",
+  "whatsapp.com", "wa.me", "twitter.com"
+]
 
 [[sources]]
 name = "G1 Piauí"
 type = "listing"
 url = "https://g1.globo.com/pi/piaui/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["g1.globo.com"]
+link_selector = "a.feed-post-link"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = ["/ao-vivo/", "/videos", "/podcast", "/loterias", "/carros/", "/economia/", "/educacao/"]
 
 [[sources]]
 name = "G1"
 type = "listing"
 url = "https://g1.globo.com/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["g1.globo.com"]
+link_selector = "a.feed-post-link"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = ["/ao-vivo/", "/videos", "/podcast", "/loterias", "/carros/", "/economia/", "/educacao/"]
 
 [[sources]]
 name = "OitoMeia"
 type = "listing"
 url = "https://www.oitomeia.com.br/noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["www.oitomeia.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticias/"]
+deny_url_patterns = [
+  "/categoria/", "/tag/", "/contato", "/quem-somos",
+  "whatsapp.com", "wa.me", "twitter.com", "facebook.com", "instagram.com"]
 
 [[sources]]
 name = "Portal AZ"
 type = "listing"
 url = "https://www.portalaz.com.br/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["www.portalaz.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticia/|/noticias/|/materia/"]
+deny_url_patterns = [
+  "/editorias/", "/colunas/", "/institucional/",
+  "/politica-de-privacidade", "/cookies",
+  "whatsapp.com", "wa.me", "twitter.com"]
 
 [[sources]]
 name = "Boletim Brio"
 type = "listing"
 url = "https://boletimbrio.com/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
 
 [[sources]]
 name = "GP1"
 type = "listing"
 url = "https://www.gp1.com.br/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+allow_domains = ["www.gp1.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticias/.+/.+"]
+deny_url_patterns = [
+  "/noticias/brasil/?$", "/noticias/brasil/piaui/?$",
+  "/blogs-e-colunas/", "/tv/", "/noticias-sobre/",
+  "whatsapp.com", "wa.me", "twitter.com"
+]
 
 [[sources]]
 name = "Meio Norte"
 type = "listing"
-url = "https://www.meionews.com/ultimas-noticias/"
-article_selector = "a"
-article_url_pattern = "/"
+url = "https://www.meionews.com/ultimas-noticias/pg/1"
+allow_domains = ["www.meionews.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticias/.+/.+"]
+deny_url_patterns = [
+  "/noticias/economia/?$", "/noticias/internacional/?$", "/noticias/tecnologia/?$",
+  "/noticias/?$",
+  "whatsapp.com", "wa.me", "twitter.com"
+]

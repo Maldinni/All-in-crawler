@@ -1,10 +1,9 @@
 import re
-from typing import List, Optional
+from typing import List, Optional, Any, Dict, List
 from urllib.parse import urlencode, urlparse, parse_qs, urlunparse, urljoin
 
 import requests
 from bs4 import BeautifulSoup
-
 
 def discover_article_urls_listing(
     listing_url: str,
@@ -15,49 +14,44 @@ def discover_article_urls_listing(
     allow_url_patterns: Optional[List[str]] = None,
     deny_url_patterns: Optional[List[str]] = None,
 ) -> List[str]:
-    headers = {
-        "User-Agent": user_agent,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "pt-BR,pt;q=0.9",
-    }
-
+    headers = {"User-Agent": user_agent}
     r = requests.get(listing_url, headers=headers, timeout=timeout_sec)
+
+    # se a página não existe, só retorna vazio (sinal de "acabou")
+    if r.status_code == 404:
+        return []
+
     r.raise_for_status()
 
     soup = BeautifulSoup(r.text, "html.parser")
 
     urls = []
-
     for a in soup.select(link_selector):
-        href = a.get("href", "").strip()
+        href = (a.get("href") or "").strip()
         if not href:
             continue
 
         full = urljoin(listing_url, href)
 
-        host = urlparse(full).netloc.lower()
-        if any(bad in host for bad in ["whatsapp.com", "wa.me", "twitter.com", "t.me", "facebook.com", "instagram.com", "spotify.com"]):
-            continue
-
-        # filtra domínios
+        # filtra domínio
         if allow_domains:
             netloc = urlparse(full).netloc
             if not any(netloc.endswith(d) for d in allow_domains):
                 continue
 
-        # allow patterns (ex: /noticia/)
-        if allow_url_patterns:
-            if not any(re.search(p, full) for p in allow_url_patterns):
-                continue
+        # ignora âncoras
+        if "#" in full:
+            continue
 
-        # deny patterns (ex: /tag/, /videos/)
+        # deny patterns (substring ou regex)
         if deny_url_patterns:
             if any(re.search(p, full) for p in deny_url_patterns):
                 continue
 
-        # ignora âncoras
-        if "#" in full:
-            continue
+        # allow patterns (se existir, precisa casar ao menos 1)
+        if allow_url_patterns:
+            if not any(re.search(p, full) for p in allow_url_patterns):
+                continue
 
         urls.append(full)
 
@@ -68,7 +62,6 @@ def discover_article_urls_listing(
         if u not in seen:
             out.append(u)
             seen.add(u)
-
     return out
 
 def build_listing_pages(source: dict) -> list[str]:
@@ -101,6 +94,75 @@ def build_listing_pages(source: dict) -> list[str]:
         return pages
 
     return [base]
+
+def discover_urls_with_wp_pagination(source: Dict[str, Any], scraping: Dict[str, Any]) -> List[str]:
+    start = int(source.get("pagination", {}).get("start", 1))
+    max_pages = int(source.get("pagination", {}).get("end", 200))  # pode existir, mas vamos parar antes
+    base_url = source["url"]
+
+    all_urls: List[str] = []
+    prev_page_urls: set[str] = set()
+
+    headers = {"User-Agent": scraping["user_agent"]}
+    timeout = int(scraping["timeout_sec"])
+
+    for page in range(start, max_pages + 1):
+        # Se vier com {page} no TOML, usa format
+        if "{page}" in base_url:
+            page_url = base_url.format(page=page)
+        else:
+            # fallback: WP comum -> /page/N/
+            if page == 1:
+                page_url = base_url
+            else:
+                if not base_url.endswith("/"):
+                    base_url_slash = base_url + "/"
+                else:
+                    base_url_slash = base_url
+                page_url = base_url_slash + f"page/{page}/"
+
+        try:
+            r = requests.get(page_url, headers=headers, timeout=timeout)
+            if r.status_code == 404:
+                # acabou a paginação
+                break
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            # se for 404 já saiu, outros erros você decide se quebra ou continua
+            break
+        except Exception:
+            break
+
+        page_urls = discover_article_urls_listing(
+            listing_url=page_url,
+            allow_domains=source.get("allow_domains"),
+            user_agent=scraping["user_agent"],
+            timeout_sec=timeout,
+            link_selector=source.get("link_selector", "a[href]"),
+            allow_url_patterns=source.get("allow_url_patterns"),
+            deny_url_patterns=source.get("deny_url_patterns"),
+        )
+
+        # se não achou nada útil nessa página, geralmente significa “acabou”
+        if not page_urls:
+            break
+
+        page_set = set(page_urls)
+        # proteção contra loop / repetição
+        if page_set == prev_page_urls:
+            break
+        prev_page_urls = page_set
+
+        all_urls.extend(page_urls)
+
+    # dedup preservando ordem
+    seen = set()
+    out = []
+    for u in all_urls:
+        if u not in seen:
+            out.append(u)
+            seen.add(u)
+    return out
 
 def discover_g1_urls_follow_see_more(
     start_url: str,

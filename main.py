@@ -2,7 +2,7 @@ from time import sleep
 
 from src.utils.parsing import parse_args, load_config
 from src.utils.checkpoints import load_processed_urls, save_processed_urls
-from src.utils.discovery import discover_article_urls_listing, build_listing_pages, discover_g1_urls_follow_see_more
+from src.utils.discovery import discover_article_urls_listing, build_listing_pages, discover_g1_urls_follow_see_more, discover_urls_with_wp_pagination
 from src.utils.extraction import extract_with_retry
 from src.utils.io import ensure_dirs, determine_output_filename, append_csv
 
@@ -40,8 +40,9 @@ def main():
         listing_url = source["url"]
         allow_domains = source.get("allow_domains")
         try:
-            all_urls = []
+            all_urls: list[str] = []
 
+            # 1) Caso especial G1 (segue o "Veja mais")
             if source["name"] in ("G1", "G1 Piauí"):
                 urls = discover_g1_urls_follow_see_more(
                     start_url=source["url"],
@@ -55,9 +56,14 @@ def main():
                 )
                 all_urls.extend(urls)
 
+            # 2) WordPress pagination (/page/2/, /page/3/...) com "stop on 404/empty"
+            elif source["name"].startswith("Boletim Brio"):
+                urls = discover_urls_with_wp_pagination(source, scraping)
+                all_urls.extend(urls)
+
+            # 3) Padrão: paginação configurada no TOML (build_listing_pages)
             else:
                 listing_pages = build_listing_pages(source)
-
                 for listing_url in listing_pages:
                     urls = discover_article_urls_listing(
                         listing_url=listing_url,
@@ -70,22 +76,20 @@ def main():
                     )
                     all_urls.extend(urls)
 
-            # dedup preservando ordem
-            seen = set()
-            urls = []
-            for u in all_urls:
-                if u not in seen:
-                    urls.append(u)
-                    seen.add(u)
-
         except Exception as e:
             print(f"[WARN] Failed to discover URLs for {source['name']}: {e}")
             continue
 
+        # dedup preservando ordem
+        seen = set()
+        urls = []
+        for u in all_urls:
+            if u not in seen:
+                urls.append(u)
+                seen.add(u)
 
-        # limita por fonte
+        # limite
         urls = urls[: int(scraping["max_articles_per_source"])]
-
         print(f"Discovered URLs: {len(urls)} (limit applied)")
 
         for url in urls:

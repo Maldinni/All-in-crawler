@@ -109,9 +109,6 @@ def main():
                 float(scraping["sleep_time"])
             )
 
-
-            # se falhar, marca como processado ou não? (decisão)
-            # no protótipo, eu NÃO marcaria como processado se falhou
             if not data or not data.get("text"):
                 continue
 

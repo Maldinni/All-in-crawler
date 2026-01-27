@@ -57,7 +57,7 @@ def main():
                 all_urls.extend(urls)
 
             # 2) WordPress pagination (/page/2/, /page/3/...) com "stop on 404/empty"
-            elif source["name"].startswith("Boletim Brio"):
+            elif source["name"].startswith("GP1"):
                 urls = discover_urls_with_wp_pagination(source, scraping)
                 all_urls.extend(urls)
 

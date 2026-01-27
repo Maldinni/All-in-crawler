@@ -32,16 +32,16 @@ name = "GP1"
 type = "listing"
 url = "https://www.gp1.com.br/ultimas-noticias/"
 allow_domains = ["www.gp1.com.br"]
-link_selector = "a[href]"
-allow_url_patterns = ["/noticias/.+/.+"]
+link_selector = "a[href*='/noticia/']"
+allow_url_patterns = ["/noticia/20\\d{2}/\\d{1,2}/\\d{1,2}/"]
 deny_url_patterns = [
-  "/noticias/brasil/?$", "/noticias/brasil/piaui/?$",
   "/blogs-e-colunas/", "/tv/", "/noticias-sobre/",
-  "whatsapp.com", "wa.me", "twitter.com"
+  "/institucional/", "/galerias/",
+  "whatsapp.com", "wa.me", "twitter.com", "facebook.com", "instagram.com"
 ]
 
 [sources.pagination]
 mode = "query"
 page_param = "page"
 start = 1
-end = 10
+end = 100

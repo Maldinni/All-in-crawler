@@ -1,4 +1,42 @@
 [[sources]]
+name = "Conecta Piauí"
+type = "listing"
+url = "https://conectapiaui.com.br/ultimas-noticias/"
+allow_domains = ["conectapiaui.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = [
+  "/institucional/", "/tudo-sobre/", "/tabelas/", "/tv-",
+  "/ultimas-noticias/?", "/ultimas-noticias/?page=",
+  "/ultimas-noticias/?$", "/ultimas-noticias/$",
+  "whatsapp.com", "wa.me", "twitter.com"
+]
+
+[sources.pagination]
+mode = "query"
+page_param = "page"
+start = 1
+end = 100
+
+[[sources]]
+name = "G1 Piauí"
+type = "listing"
+url = "https://g1.globo.com/pi/piaui/ultimas-noticias/"
+allow_domains = ["g1.globo.com"]
+link_selector = "a.feed-post-link"
+allow_url_patterns = ["/pi/piaui/noticia/"]
+deny_url_patterns = ["/ao-vivo/", "/videos", "/podcast", "/especiais/"]
+
+[[sources]]
+name = "G1"
+type = "listing"
+url = "https://g1.globo.com/ultimas-noticias/"
+allow_domains = ["g1.globo.com"]
+link_selector = "a.feed-post-link"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = ["/ao-vivo/", "/videos", "/podcast", "/especiais/", "/fato-ou-fake/"]
+
+[[sources]]
 name = "OitoMeia"
 type = "listing"
 url = "https://www.oitomeia.com.br/noticias/"
@@ -28,6 +66,89 @@ start = 1
 end = 100
 
 [[sources]]
+name = "Boletim Brio - Sávia Barreto"
+type = "listing"
+url = "https://boletimbrio.com/saviabarreto/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Ápice"
+type = "listing"
+url = "https://boletimbrio.com/apice/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Todavia"
+type = "listing"
+url = "https://boletimbrio.com/todavia/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Oráculo"
+type = "listing"
+url = "https://boletimbrio.com/oraculo/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Divã"
+type = "listing"
+url = "https://boletimbrio.com/diva/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Editorial"
+type = "listing"
+url = "https://boletimbrio.com/editorial/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
 name = "GP1"
 type = "listing"
 url = "https://www.gp1.com.br/ultimas-noticias/"
@@ -43,5 +164,23 @@ deny_url_patterns = [
 [sources.pagination]
 mode = "query"
 page_param = "page"
+start = 1
+end = 100
+
+[[sources]]
+name = "Meio Norte"
+type = "listing"
+url = "https://www.meionews.com/ultimas-noticias/pg/{page}"
+allow_domains = ["www.meionews.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticias/.+/.+"]
+deny_url_patterns = [
+  "/noticias/economia/?$", "/noticias/internacional/?$", "/noticias/tecnologia/?$",
+  "/noticias/?$",
+  "whatsapp.com", "wa.me", "twitter.com"
+]
+
+[sources.pagination]
+mode = "path_format"
 start = 1
 end = 100

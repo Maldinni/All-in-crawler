@@ -16,7 +16,7 @@ deny_url_patterns = [
 mode = "query"
 page_param = "page"
 start = 1
-end = 10
+end = 100
 
 [[sources]]
 name = "G1 Piauí"
@@ -59,27 +59,113 @@ deny_url_patterns = [
   "/politica-de-privacidade", "/cookies",
   "whatsapp.com", "wa.me", "twitter.com"]
 
+[sources.pagination]
+mode = "query"
+page_param = "page"
+start = 1
+end = 100
+
 [[sources]]
-name = "Boletim Brio"
+name = "Boletim Brio - Sávia Barreto"
 type = "listing"
-url = "https://boletimbrio.com/"
+url = "https://boletimbrio.com/saviabarreto/page/{page}/"
 allow_domains = ["boletimbrio.com"]
 link_selector = "a[href]"
 allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
 deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Ápice"
+type = "listing"
+url = "https://boletimbrio.com/apice/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Todavia"
+type = "listing"
+url = "https://boletimbrio.com/todavia/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Oráculo"
+type = "listing"
+url = "https://boletimbrio.com/oraculo/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Divã"
+type = "listing"
+url = "https://boletimbrio.com/diva/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
+
+[[sources]]
+name = "Boletim Brio - Editorial"
+type = "listing"
+url = "https://boletimbrio.com/editorial/page/{page}/"
+allow_domains = ["boletimbrio.com"]
+link_selector = "a[href]"
+allow_url_patterns = ["/20\\d{2}/\\d{2}/\\d{2}/"]
+deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/apice/", "/todavia/", "/repertorio/"]
+
+[sources.pagination]
+mode = "path_format"
+start = 1
+end = 100
 
 [[sources]]
 name = "GP1"
 type = "listing"
 url = "https://www.gp1.com.br/ultimas-noticias/"
 allow_domains = ["www.gp1.com.br"]
-link_selector = "a[href]"
-allow_url_patterns = ["/noticias/.+/.+"]
+link_selector = "a[href*='/noticia/']"
+allow_url_patterns = ["/noticia/20\\d{2}/\\d{1,2}/\\d{1,2}/"]
 deny_url_patterns = [
-  "/noticias/brasil/?$", "/noticias/brasil/piaui/?$",
   "/blogs-e-colunas/", "/tv/", "/noticias-sobre/",
-  "whatsapp.com", "wa.me", "twitter.com"
+  "/institucional/", "/galerias/",
+  "whatsapp.com", "wa.me", "twitter.com", "facebook.com", "instagram.com"
 ]
+
+[sources.pagination]
+mode = "query"
+page_param = "page"
+start = 1
+end = 100
 
 [[sources]]
 name = "Meio Norte"
@@ -97,4 +183,4 @@ deny_url_patterns = [
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 10
+end = 100

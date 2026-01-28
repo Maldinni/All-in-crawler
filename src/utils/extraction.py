@@ -8,14 +8,8 @@ from typing import Any, Dict, Optional
 from time import sleep
 from newspaper import Article
 
-
-# --------------------
-# Utilidades
-# --------------------
-
 def normalize_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
-
 
 def limit_words(text: Optional[str], max_words: int = 1000) -> Optional[str]:
     if not text:
@@ -36,10 +30,6 @@ def normalize_url(url: str) -> str:
     parts = urlparse(url)
     return urlunparse((parts.scheme, parts.netloc, parts.path, "", "", ""))
 
-
-# --------------------
-# Fallback HTML
-# --------------------
 
 def extract_text_from_html(url: str, user_agent: str, timeout: int = 20) -> str:
     headers = {

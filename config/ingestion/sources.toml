@@ -184,3 +184,9 @@ deny_url_patterns = [
 mode = "path_format"
 start = 1
 end = 100
+
+[[sources]]
+name = "X - Politica"
+type = "x_search"
+query = '(Bolsonaro OR Lula OR "Jones Manoel") lang:pt -is:retweet -is:reply'
+pages = 2

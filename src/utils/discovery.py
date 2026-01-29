@@ -17,7 +17,6 @@ def discover_article_urls_listing(
     headers = {"User-Agent": user_agent}
     r = requests.get(listing_url, headers=headers, timeout=timeout_sec)
 
-    # se a página não existe, só retorna vazio (sinal de "acabou")
     if r.status_code == 404:
         return []
 
@@ -33,29 +32,24 @@ def discover_article_urls_listing(
 
         full = urljoin(listing_url, href)
 
-        # filtra domínio
         if allow_domains:
             netloc = urlparse(full).netloc
             if not any(netloc.endswith(d) for d in allow_domains):
                 continue
 
-        # ignora âncoras
         if "#" in full:
             continue
 
-        # deny patterns (substring ou regex)
         if deny_url_patterns:
             if any(re.search(p, full) for p in deny_url_patterns):
                 continue
 
-        # allow patterns (se existir, precisa casar ao menos 1)
         if allow_url_patterns:
             if not any(re.search(p, full) for p in allow_url_patterns):
                 continue
 
         urls.append(full)
 
-    # dedup preservando ordem
     seen = set()
     out = []
     for u in urls:
@@ -78,7 +72,7 @@ def build_listing_pages(source: dict) -> list[str]:
 
     if mode == "path_format":
         for p in range(start, end + 1):
-            pages.append(base.format(page=p))  # 🔑 substitui {page}
+            pages.append(base.format(page=p))
         return pages
 
     if mode == "query":
@@ -97,7 +91,7 @@ def build_listing_pages(source: dict) -> list[str]:
 
 def discover_urls_with_wp_pagination(source: Dict[str, Any], scraping: Dict[str, Any]) -> List[str]:
     start = int(source.get("pagination", {}).get("start", 1))
-    max_pages = int(source.get("pagination", {}).get("end", 200))  # pode existir, mas vamos parar antes
+    max_pages = int(source.get("pagination", {}).get("end", 200))
     base_url = source["url"]
 
     all_urls: List[str] = []
@@ -107,11 +101,9 @@ def discover_urls_with_wp_pagination(source: Dict[str, Any], scraping: Dict[str,
     timeout = int(scraping["timeout_sec"])
 
     for page in range(start, max_pages + 1):
-        # Se vier com {page} no TOML, usa format
         if "{page}" in base_url:
             page_url = base_url.format(page=page)
         else:
-            # fallback: WP comum -> /page/N/
             if page == 1:
                 page_url = base_url
             else:
@@ -124,11 +116,9 @@ def discover_urls_with_wp_pagination(source: Dict[str, Any], scraping: Dict[str,
         try:
             r = requests.get(page_url, headers=headers, timeout=timeout)
             if r.status_code == 404:
-                # acabou a paginação
                 break
             r.raise_for_status()
         except requests.HTTPError as e:
-            # se for 404 já saiu, outros erros você decide se quebra ou continua
             break
         except Exception:
             break
@@ -143,19 +133,16 @@ def discover_urls_with_wp_pagination(source: Dict[str, Any], scraping: Dict[str,
             deny_url_patterns=source.get("deny_url_patterns"),
         )
 
-        # se não achou nada útil nessa página, geralmente significa “acabou”
         if not page_urls:
             break
 
         page_set = set(page_urls)
-        # proteção contra loop / repetição
         if page_set == prev_page_urls:
             break
         prev_page_urls = page_set
 
         all_urls.extend(page_urls)
 
-    # dedup preservando ordem
     seen = set()
     out = []
     for u in all_urls:
@@ -172,7 +159,7 @@ def discover_g1_urls_follow_see_more(
     link_selector: str = "a.feed-post-link",
     allow_url_patterns=None,
     deny_url_patterns=None,
-    max_pages: int = 30,   # segurança
+    max_pages: int = 30,
 ):
     headers = {"User-Agent": user_agent}
     all_urls = []
@@ -189,7 +176,6 @@ def discover_g1_urls_follow_see_more(
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
 
-        # reaproveita sua lógica: pega links de matérias
         for a in soup.select(link_selector):
             href = (a.get("href") or "").strip()
             if not href:
@@ -215,14 +201,12 @@ def discover_g1_urls_follow_see_more(
 
             all_urls.append(full)
 
-        # acha o próximo "Veja mais"
         see_more = soup.find("a", string=re.compile(r"Veja mais", re.I))
         if not see_more or not see_more.get("href"):
             break
 
         next_page = urljoin(next_page, see_more["href"])
 
-    # dedup preservando ordem
     seen = set()
     out = []
     for u in all_urls:

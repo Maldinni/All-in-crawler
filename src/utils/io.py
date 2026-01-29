@@ -13,11 +13,9 @@ CSV_FIELDS = [
     "text"
 ]
 
-
 def ensure_dirs(*paths: str) -> None:
     for p in paths:
         Path(p).mkdir(parents=True, exist_ok=True)
-
 
 def determine_output_filename(output_dir: str, ext: str = "csv") -> Tuple[str, int]:
     out = Path(output_dir)
@@ -27,7 +25,7 @@ def determine_output_filename(output_dir: str, ext: str = "csv") -> Tuple[str, i
     if not existing:
         return str(out / f"shard_{0:04d}.{ext}"), 0
 
-    last = existing[-1].stem  # shard_0007
+    last = existing[-1].stem
     shard_id = int(last.split("_")[1]) + 1
     return str(out / f"shard_{shard_id:04d}.{ext}"), shard_id
 

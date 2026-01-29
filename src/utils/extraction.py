@@ -8,14 +8,8 @@ from typing import Any, Dict, Optional
 from time import sleep
 from newspaper import Article
 
-
-# --------------------
-# Utilidades
-# --------------------
-
 def normalize_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
-
 
 def limit_words(text: Optional[str], max_words: int = 1000) -> Optional[str]:
     if not text:
@@ -36,10 +30,6 @@ def normalize_url(url: str) -> str:
     parts = urlparse(url)
     return urlunparse((parts.scheme, parts.netloc, parts.path, "", "", ""))
 
-
-# --------------------
-# Fallback HTML
-# --------------------
 
 def extract_text_from_html(url: str, user_agent: str, timeout: int = 20) -> str:
     headers = {
@@ -65,11 +55,6 @@ def extract_text_from_html(url: str, user_agent: str, timeout: int = 20) -> str:
 
     text = " ".join(paragraphs)
     return normalize_whitespace(text)
-
-
-# --------------------
-# Extractor principal
-# --------------------
 
 def extract_article(
     url: str,
@@ -112,11 +97,6 @@ def extract_article(
         "word_count": word_count,
         "text_hash": hashlib.sha1(raw_text.encode("utf-8")).hexdigest() if raw_text else None,
     }
-
-
-# --------------------
-# Retry wrapper
-# --------------------
 
 def extract_with_retry(
     url: str,

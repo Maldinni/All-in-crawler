@@ -56,11 +56,6 @@ def extract_text_from_html(url: str, user_agent: str, timeout: int = 20) -> str:
     text = " ".join(paragraphs)
     return normalize_whitespace(text)
 
-
-# --------------------
-# Extractor principal
-# --------------------
-
 def extract_article(
     url: str,
     source_name: str,
@@ -102,11 +97,6 @@ def extract_article(
         "word_count": word_count,
         "text_hash": hashlib.sha1(raw_text.encode("utf-8")).hexdigest() if raw_text else None,
     }
-
-
-# --------------------
-# Retry wrapper
-# --------------------
 
 def extract_with_retry(
     url: str,

@@ -3,7 +3,7 @@ sleep_time = 0.5
 num_attempts = 5
 timeout_sec = 40
 user_agent = "Mozilla/5.0 (compatible; AllInCrawler/1.0)"
-max_articles_per_source = 1
+max_articles_per_source = 20
 
 
 [sharding]

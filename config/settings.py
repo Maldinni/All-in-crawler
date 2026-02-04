@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 from pathlib import Path
 
-import tweepy
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent

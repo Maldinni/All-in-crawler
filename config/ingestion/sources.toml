@@ -186,7 +186,7 @@ start = 1
 end = 100
 
 [[sources]]
-name = "X - Politica"
+name = "X - Teresina"
 type = "x_search"
-query = '(Bolsonaro OR Lula OR "Jones Manoel") lang:pt -is:retweet -is:reply'
-pages = 2
+query = '( Teresina AND (política OR prefeitura OR vereador OR campanha OR eleição) ) lang:pt -is:retweet -is:reply'
+pages = 20

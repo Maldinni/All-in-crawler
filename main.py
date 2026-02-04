@@ -31,7 +31,7 @@ def main():
     processed = load_processed_urls(processed_path)
 
     output_raw_file, shard_id = determine_output_filename(
-        paths["output"], ext=sharding.get("format", "jsonl")
+        paths["raw"], ext=sharding.get("format", "jsonl")
     )
     buffer = []
     items_per_shard = int(sharding.get("items_per_shard", 200))
@@ -125,7 +125,7 @@ def main():
                     save_processed_urls(processed_path, processed)
                     buffer = []
                     output_raw_file, shard_id = determine_output_filename(
-                        paths["output"], ext=sharding.get("format", "jsonl")
+                        paths["raw"], ext=sharding.get("format", "jsonl")
                     )
                     print(f"Flushed shard -> {output_raw_file}")
 

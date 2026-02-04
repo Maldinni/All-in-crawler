@@ -30,7 +30,7 @@ def main():
     processed_path = f'{paths["checkpoints"]}/processed_urls.json'
     processed = load_processed_urls(processed_path)
 
-    output_file, shard_id = determine_output_filename(
+    output_raw_file, shard_id = determine_output_filename(
         paths["output"], ext=sharding.get("format", "jsonl")
     )
     buffer = []
@@ -121,13 +121,13 @@ def main():
                 processed.add(url)
 
                 if len(buffer) >= items_per_shard:
-                    append_csv(output_file, buffer)
+                    append_csv(output_raw_file, buffer)
                     save_processed_urls(processed_path, processed)
                     buffer = []
-                    output_file, shard_id = determine_output_filename(
+                    output_raw_file, shard_id = determine_output_filename(
                         paths["output"], ext=sharding.get("format", "jsonl")
                     )
-                    print(f"Flushed shard -> {output_file}")
+                    print(f"Flushed shard -> {output_raw_file}")
 
                 sleep(float(scraping["sleep_time"]))
 
@@ -166,13 +166,13 @@ def main():
                 processed.add(key)
 
                 if len(buffer) >= items_per_shard:
-                    append_csv(output_file, buffer)
+                    append_csv(output_raw_file, buffer)
                     save_processed_urls(processed_path, processed)
                     buffer = []
-                    output_file, shard_id = determine_output_filename(
-                        paths["output"], ext=sharding.get("format", "jsonl")
+                    output_raw_file, shard_id = determine_output_filename(
+                        paths["raw"], ext=sharding.get("format", "jsonl")
                     )
-                    print(f"Flushed shard -> {output_file}")
+                    print(f"Flushed shard -> {output_raw_file}")
 
                 sleep(float(scraping["sleep_time"]))
 
@@ -183,9 +183,9 @@ def main():
         continue
 
     if buffer and not runtime["dry_run"]:
-        append_csv(output_file, buffer)
+        append_csv(output_raw_file, buffer)
         save_processed_urls(processed_path, processed)
-        print(f"Final flush -> {output_file}")
+        print(f"Final flush -> {output_raw_file}")
 
 
 if __name__ == "__main__":

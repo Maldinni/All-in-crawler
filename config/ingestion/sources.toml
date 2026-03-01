@@ -16,7 +16,7 @@ deny_url_patterns = [
 mode = "query"
 page_param = "page"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "G1 Piauí"
@@ -63,7 +63,7 @@ deny_url_patterns = [
 mode = "query"
 page_param = "page"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Sávia Barreto"
@@ -76,7 +76,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/",
 
 [sources.pagination]
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Ápice"
@@ -90,7 +90,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/",
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Todavia"
@@ -104,7 +104,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/",
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Oráculo"
@@ -118,7 +118,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/",
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Divã"
@@ -132,7 +132,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/editorial/",
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Boletim Brio - Editorial"
@@ -146,7 +146,7 @@ deny_url_patterns = ["/contato/", "/quem-somos/", "/colunistas/", "/apice/", "/t
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "GP1"
@@ -165,7 +165,7 @@ deny_url_patterns = [
 mode = "query"
 page_param = "page"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
 name = "Meio Norte"
@@ -183,10 +183,67 @@ deny_url_patterns = [
 [sources.pagination]
 mode = "path_format"
 start = 1
-end = 100
+end = 1000
 
 [[sources]]
-name = "X - Politica"
+name = "X - Comunicação Política"
 type = "x_search"
-query = '(Bolsonaro OR Lula OR "Jones Manoel") lang:pt -is:retweet -is:reply'
-pages = 2
+query = '( "comunicação política" OR "comunicação institucional" OR "assessoria de comunicação" OR "discurso político" ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Política Geral"
+type = "x_search"
+query = '( política OR "cenário político" OR "debate político" OR "sistema político" ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Candidatos"
+type = "x_search"
+query = '(Bolsonaro OR Lula OR Tarcisio OR Amoedo OR "Jones Manoel") lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Teresina"
+type = "x_search"
+query = '( Teresina AND (política OR prefeitura OR vereador OR campanha OR eleição) ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Marketing Político"
+type = "x_search"
+query = '( "marketing político" OR "campanha eleitoral" OR "estratégia política" OR "marketing eleitoral" ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Vereadores"
+type = "x_search"
+query = '( vereador OR vereadores OR "câmara municipal" OR legislativo ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+[[sources]]
+name = "X - Prefeituras"
+type = "x_search"
+query = '( prefeitura OR prefeituras OR prefeito OR prefeita OR "administração municipal" ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+
+[[sources]]
+name = "X - Política Piauí"
+type = "x_search"
+query = '( política AND (Piauí OR Piaui OR Teresina OR "política piauiense" OR PI) ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+
+[[sources]]
+name = "X - Vereadores Piauí"
+type = "x_search"
+query = '( (vereador OR vereadores OR "câmara municipal") AND (Piauí OR Piaui OR Teresina) ) lang:pt -is:retweet -is:reply'
+pages = 2000
+
+
+[[sources]]
+name = "X - Prefeituras Piauí"
+type = "x_search"
+query = '( (prefeitura OR prefeituras OR prefeito OR prefeita OR "administração municipal") AND (Piauí OR Piaui OR Teresina) ) lang:pt -is:retweet -is:reply'
+pages = 2000

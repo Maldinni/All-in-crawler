@@ -8,4 +8,4 @@ max_articles_per_source = 1
 
 [sharding]
 items_per_shard = 200
-format = "csv"  # ou "jsonl"
+format = "csv" # ou "jsonl"

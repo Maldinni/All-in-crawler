@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 import pandas as pd
 import tqdm
 
@@ -5,6 +8,20 @@ def count_words(text):
     if not isinstance(text, str):
         return 0
     return len(text.split())
+
+def remove_emojis(text):
+    if not isinstance(text, str):
+        return text
+
+    # Remove emojis por categoria Unicode
+    return ''.join(
+        char for char in text
+        if not (
+            unicodedata.category(char) in ['So', 'Sk'] and
+            ('EMOJI' in unicodedata.name(char, '') or
+             ord(char) > 10000)
+        )
+    )
 
 def clean_dataframe(df, config):
 
@@ -17,6 +34,10 @@ def clean_dataframe(df, config):
 
     df = df.dropna(subset=['canonical_url', 'title', 'text'])
     df = df[df['text'].str.strip() != ""]
+
+    df['text'] = df['text'].apply(remove_emojis)
+    df['title'] = df['title'].apply(remove_emojis)
+    df['authors'] = df['authors'].apply(remove_emojis)
 
     #df['publish_date'] = pd.to_datetime(df['publish_date'], errors='coerce')
     #df = df[df['publish_date'].notnull()]

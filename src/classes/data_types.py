@@ -6,20 +6,10 @@ from typing import List
 class Article:
     """Data class for an article.
     """
-    pmid: int
-    doi: str
     title: str
     type: str
-    journal: str
     year: int
-    age: float
-    citation_count: int
-    citation_rate: float
-    abstract: str
     embedding: List[float]
-    in_links: List[int]
-    out_links: List[int]
-
 
 @dataclass
 class Embeddings:

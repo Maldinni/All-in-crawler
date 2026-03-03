@@ -16,6 +16,7 @@ def parse_args() -> argparse.Namespace:
 
     p.add_argument("--sources", default="config/ingestion/sources.toml")
     p.add_argument("--directories", default="config/directories.toml")
+    p.add_argument("--clustering", default="config/clustering.toml")
     p.add_argument("--scraping", default="config/ingestion/scraping.toml")
     p.add_argument("--cleaning", default="config/ingestion/cleaning.toml")
     p.add_argument("--initial_embedding", default="config/ingestion/initial_embedding.toml")
@@ -33,6 +34,7 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
     sources_file = load_toml(args.sources)
     cleaning_file = load_toml(args.cleaning)
     initial_embedding_file = load_toml(args.initial_embedding)
+    graph_construction_file = load_toml(args.clustering)
 
     cfg = {
         "paths": dirs_file["paths"],
@@ -43,6 +45,8 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
         "cutoff": cleaning_file["cutoff"],
         "word_limit": cleaning_file["word_limit"],
         "initial_embedding": initial_embedding_file,
+        "graph_construction": graph_construction_file["graph_construction"],
+        "community_detection": graph_construction_file["community_detection"],
     }
 
     if args.max_articles_per_source is not None:

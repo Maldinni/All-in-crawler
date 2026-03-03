@@ -1,7 +1,9 @@
 import csv
+import h5py
+import numpy as np
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
-
+from tqdm import tqdm
 
 CSV_FIELDS = [
     "source",
@@ -53,3 +55,114 @@ def append_csv(path: str, records: List[Dict[str, Any]]) -> None:
                 row[k] = v
 
             writer.writerow(row)
+
+def save_news_to_hdf5(news_list, filename, disable_tqdm=False):
+    """
+    Save news dataset to HDF5.
+
+    Parameters:
+    - news_list: list of dicts or objects with attributes
+    - filename: str
+    """
+
+    with h5py.File(filename, 'w') as file:
+
+        n = len(news_list)
+
+        # String datasets
+        sources = file.create_dataset('source', (n,),
+                                       dtype=h5py.string_dtype())
+        domains = file.create_dataset('domain', (n,),
+                                       dtype=h5py.string_dtype())
+        urls = file.create_dataset('canonical_url', (n,),
+                                    dtype=h5py.string_dtype())
+        titles = file.create_dataset('title', (n,),
+                                      dtype=h5py.string_dtype())
+        authors = file.create_dataset('authors', (n,),
+                                       dtype=h5py.string_dtype())
+        publish_dates = file.create_dataset('publish_date', (n,),
+                                             dtype=h5py.string_dtype())
+        texts = file.create_dataset('text', (n,),
+                                      dtype=h5py.string_dtype())
+
+        # Optional embedding group (if you generate later)
+        embedding_group = file.create_group('embeddings')
+
+        for i, article in tqdm(enumerate(news_list),
+                               total=n,
+                               disable=disable_tqdm):
+
+            sources[i] = str(article["source"]) if article["source"] else ""
+            domains[i] = str(article["domain"]) if article["domain"] else ""
+            urls[i] = str(article["canonical_url"]) if article["canonical_url"] else ""
+            titles[i] = str(article["title"]) if article["title"] else ""
+            authors[i] = str(article["authors"]) if article["authors"] else ""
+            publish_dates[i] = str(article["publish_date"]) if article["publish_date"] else ""
+            texts[i] = str(article["text"]) if article["text"] else ""
+
+            # Se tiver embedding
+            if "embedding" in article and article["embedding"] is not None:
+                embedding_group.create_dataset(
+                    str(i),
+                    data=np.array(article["embedding"], dtype=np.float32),
+                    dtype='f'
+                )
+            else:
+                embedding_group.create_dataset(str(i), shape=(0,), dtype='f')
+
+def load_embeddings_from_hdf5(filename):
+    """
+    Load embeddings from a single HDF5 shard.
+
+    Returns:
+    - embeddings: np.ndarray (N, D)
+    - urls: list[str]
+    """
+
+    with h5py.File(filename, "r") as f:
+
+        # 🔹 Carrega URLs (identificador)
+        urls = f["canonical_url"][:]
+        urls = [
+            u.decode("utf-8") if isinstance(u, bytes) else u
+            for u in urls
+        ]
+
+        total_articles = len(urls)
+
+        # 🔹 Carrega embeddings
+        embedding_group = f["embeddings"]
+
+        # Pega dimensão do primeiro embedding
+        first_embedding = np.array(embedding_group["0"])
+        dim = first_embedding.shape[0]
+
+        embeddings = np.zeros((total_articles, dim), dtype=np.float32)
+
+        for i in range(total_articles):
+            embeddings[i] = np.array(embedding_group[str(i)])
+
+    return embeddings, urls
+
+def load_embedding_shards(embeddings_files, disable_tqdm=False):
+    """
+    Load embeddings from multiple shards and concatenate them into a single array. Also return the associated PMIDs.
+
+    Parameters:
+    - embeddings_files: List of strings, the paths to the embeddings files.
+    - disable_tqdm: bool
+
+    Returns:
+    - embeddings: np.array, the concatenated embeddings.
+    - urls: List of strings, the URLs of the articles.
+    """
+
+    embeddings = []
+    urls = []
+
+    for file in tqdm(embeddings_files, disable=disable_tqdm):
+        embeddings_shard, urls_shard = load_embeddings_from_hdf5(file)
+        embeddings.append(embeddings_shard)
+        urls.extend(urls_shard)
+
+    return np.concatenate(embeddings, axis=0), urls

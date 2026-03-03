@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 
@@ -15,9 +15,15 @@ class Article:
 class Embeddings:
     """Data class for an embedding.
     """
-    urls: List[str]
-    embeddings: List[float]
+    urls: List[str] = field(default_factory=list)
+    embeddings: List[List[float]] = field(default_factory=list)
 
+    sources: List[str] = field(default_factory=list)
+    domains: List[str] = field(default_factory=list)
+    titles: List[str] = field(default_factory=list)
+    authors: List[str] = field(default_factory=list)
+    publish_dates: List[str] = field(default_factory=list)
+    texts: List[str] = field(default_factory=list)
 
 @dataclass
 class EmbeddingsWithLabels:

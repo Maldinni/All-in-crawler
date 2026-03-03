@@ -45,7 +45,8 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
         "cutoff": cleaning_file["cutoff"],
         "word_limit": cleaning_file["word_limit"],
         "initial_embedding": initial_embedding_file,
-        "graph_construction": graph_construction_file
+        "graph_construction": graph_construction_file["graph_construction"],
+        "community_detection": graph_construction_file["community_detection"],
     }
 
     if args.max_articles_per_source is not None:

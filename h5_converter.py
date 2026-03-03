@@ -33,6 +33,21 @@ def main():
         h5_filename = shard_directory / (pkl_file.stem + ".h5")
 
         # Salva em HDF5
+        news_list = []
+
+        for i in range(len(obj.urls)):
+            article = {
+                "source": obj.sources[i],
+                "domain": obj.domains[i],
+                "canonical_url": obj.urls[i],
+                "title": obj.titles[i],
+                "authors": obj.authors[i],
+                "publish_date": obj.publish_dates[i],
+                "text": obj.texts[i],
+                "embedding": obj.embeddings[i] if i < len(obj.embeddings) else None
+            }
+            news_list.append(article)
+
         save_news_to_hdf5(news_list, str(h5_filename))
 
     print("Conversão finalizada.")

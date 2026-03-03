@@ -92,13 +92,13 @@ def save_news_to_hdf5(news_list, filename, disable_tqdm=False):
                                total=n,
                                disable=disable_tqdm):
 
-            sources[i] = article["source"]
-            domains[i] = article["domain"]
-            urls[i] = article["canonical_url"]
-            titles[i] = article["title"]
-            authors[i] = article["authors"] if article["authors"] else ""
-            publish_dates[i] = article["publish_date"]
-            texts[i] = article["text"]
+            sources[i] = str(article["source"]) if article["source"] else ""
+            domains[i] = str(article["domain"]) if article["domain"] else ""
+            urls[i] = str(article["canonical_url"]) if article["canonical_url"] else ""
+            titles[i] = str(article["title"]) if article["title"] else ""
+            authors[i] = str(article["authors"]) if article["authors"] else ""
+            publish_dates[i] = str(article["publish_date"]) if article["publish_date"] else ""
+            texts[i] = str(article["text"]) if article["text"] else ""
 
             # Se tiver embedding
             if "embedding" in article and article["embedding"] is not None:

@@ -1,7 +1,9 @@
 import csv
+import h5py
+import numpy as np
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
-
+from tqdm import tqdm
 
 CSV_FIELDS = [
     "source",
@@ -53,3 +55,57 @@ def append_csv(path: str, records: List[Dict[str, Any]]) -> None:
                 row[k] = v
 
             writer.writerow(row)
+
+def save_news_to_hdf5(news_list, filename, disable_tqdm=False):
+    """
+    Save news dataset to HDF5.
+
+    Parameters:
+    - news_list: list of dicts or objects with attributes
+    - filename: str
+    """
+
+    with h5py.File(filename, 'w') as file:
+
+        n = len(news_list)
+
+        # String datasets
+        sources = file.create_dataset('source', (n,),
+                                       dtype=h5py.string_dtype())
+        domains = file.create_dataset('domain', (n,),
+                                       dtype=h5py.string_dtype())
+        urls = file.create_dataset('canonical_url', (n,),
+                                    dtype=h5py.string_dtype())
+        titles = file.create_dataset('title', (n,),
+                                      dtype=h5py.string_dtype())
+        authors = file.create_dataset('authors', (n,),
+                                       dtype=h5py.string_dtype())
+        publish_dates = file.create_dataset('publish_date', (n,),
+                                             dtype=h5py.string_dtype())
+        texts = file.create_dataset('text', (n,),
+                                      dtype=h5py.string_dtype())
+
+        # Optional embedding group (if you generate later)
+        embedding_group = file.create_group('embeddings')
+
+        for i, article in tqdm(enumerate(news_list),
+                               total=n,
+                               disable=disable_tqdm):
+
+            sources[i] = article["source"]
+            domains[i] = article["domain"]
+            urls[i] = article["canonical_url"]
+            titles[i] = article["title"]
+            authors[i] = article["authors"] if article["authors"] else ""
+            publish_dates[i] = article["publish_date"]
+            texts[i] = article["text"]
+
+            # Se tiver embedding
+            if "embedding" in article and article["embedding"] is not None:
+                embedding_group.create_dataset(
+                    str(i),
+                    data=np.array(article["embedding"], dtype=np.float32),
+                    dtype='f'
+                )
+            else:
+                embedding_group.create_dataset(str(i), shape=(0,), dtype='f')

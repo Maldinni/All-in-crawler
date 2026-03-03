@@ -17,8 +17,6 @@ def main():
 
     embedding_parameters = cfg["initial_embedding"]
 
-    print(embedding_parameters)
-
     model_name, sleep_time, batch_size, items_per_shard = unpack_embedding_parameters(
         embedding_parameters
     )
@@ -58,7 +56,7 @@ def main():
     for start in tqdm(range(0, len(df), items_per_shard)):
         end = start + items_per_shard
 
-        text_embeddings = Embeddings(urls=[], embeddings=[])
+        text_embeddings = Embeddings()
 
         selection = df.iloc[start:end]
         texts = selection['text'].tolist()
@@ -68,6 +66,12 @@ def main():
 
         # Store PMIDs and embeddings
         text_embeddings.urls = selection['canonical_url'].tolist()
+        text_embeddings.sources = selection['source'].tolist()
+        text_embeddings.domains = selection['domain'].tolist()
+        text_embeddings.titles = selection['title'].tolist()
+        text_embeddings.authors = selection['authors'].fillna("").tolist()
+        text_embeddings.publish_dates = selection['publish_date'].tolist()
+        text_embeddings.texts = selection['text'].tolist()
         text_embeddings.embeddings = embedded_texts
 
         # Save the current shard of embeddings to disk
@@ -83,8 +87,6 @@ def main():
 
         # Wait before next batch to avoid overloading resources
         time.sleep(sleep_time)
-
-
 
 if __name__ == "__main__":
     main()

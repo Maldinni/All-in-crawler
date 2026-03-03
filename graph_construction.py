@@ -18,7 +18,7 @@ def main():
     shard_directory = f'{cfg["paths"]["raw"]}/shards_h5'
     graph_directory = f'{cfg["paths"]["processed"]}/graphs'
 
-    # Ensure embedding output directory exists
+    # Ensure graph output directory exists
     os.makedirs(graph_directory, exist_ok=True)
 
     shards_files = glob(os.path.join(shard_directory, '*.h5'))

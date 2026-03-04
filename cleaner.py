@@ -5,7 +5,6 @@ from src.utils.cleaning import clean_dataframe, concatenate_files, sort_datafram
 from src.utils.parsing import parse_args, load_config
 from src.utils.io import ensure_dirs
 
-
 def main():
     args = parse_args()
     cfg = load_config(args)

@@ -17,12 +17,6 @@ class Embeddings:
     """
     urls: List[str] = field(default_factory=list)
     embeddings: List[List[float]] = field(default_factory=list)
-
-    sources: List[str] = field(default_factory=list)
-    domains: List[str] = field(default_factory=list)
-    titles: List[str] = field(default_factory=list)
-    authors: List[str] = field(default_factory=list)
-    publish_dates: List[str] = field(default_factory=list)
     texts: List[str] = field(default_factory=list)
 
 @dataclass

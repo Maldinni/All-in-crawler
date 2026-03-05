@@ -73,7 +73,7 @@ def construct_knn_graph(embeddings, k):
     print("Constructing edge list...")
     edge_set = set()
     weights = []
-    SIM_THRESHOLD = 0.5  # ajuste entre 0.7–0.85
+    SIM_THRESHOLD = 0.55  # ajuste entre 0.7–0.85
 
     for i in tqdm(range(num_points)):
         for neighbor_idx, distance in zip(indices[i], distances[i]):

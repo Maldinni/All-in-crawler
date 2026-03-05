@@ -25,7 +25,7 @@ def main():
     graph_file = os.path.join(graph_directory, 'article_similarity.graphml')
 
     print('Loading embeddings...')
-    embeddings, urls = load_embedding_shards(shards_files)
+    embeddings, texts = load_embedding_shards(shards_files)
 
     num_points = embeddings.shape[0]
     num_neighbors = graph_cfg['num_neighbors']
@@ -43,7 +43,7 @@ def main():
 
     print('Creating igraph Graph object...')
     G = ig.Graph(edges=edges, directed=False)
-    G.vs['url'] = urls
+    G.vs['texts'] = texts
     G.es['weight'] = weights
 
     print('Saving graph...')

@@ -20,23 +20,11 @@ def main():
     DEFINITION_PROMPT = PromptTemplate(
         input_variables=["articles"],
         template="""
-                Você receberá um conjunto de textos jornalísticos pertencentes a um mesmo cluster temático.
+                Você receberá textos jornalísticos sobre um mesmo tema.
 
-                Todos os textos tratam de um mesmo fenômeno social, político ou institucional.
+                Analise apenas o que está nos textos. Não faça inferências externas.
 
-                Sua tarefa é analisar exclusivamente o conteúdo fornecido e produzir uma síntese estruturada seguindo exatamente o formato abaixo.
-
-                Regras fundamentais:
-
-                - Utilize apenas informações que estejam explicitamente presentes nos textos.
-                - Não faça inferências externas.
-                - Não adicione contexto histórico ou político que não esteja nos textos.
-                - Não generalize além do que é dito.
-                - Seja preciso e objetivo.
-                - Não utilize comentários, explicações adicionais ou introduções.
-                - Siga exatamente a estrutura solicitada.
-
-                Estrutura obrigatória da resposta:
+                Produza a saída assim:
 
                 Palavras-chave:
                 - termo 1
@@ -46,25 +34,13 @@ def main():
                 - termo 5
 
                 Título:
-                Uma frase curta e descritiva que sintetize o fenômeno central abordado.
+                Frase curta que resuma o fenômeno central.
 
                 Descrição:
-                Escreva 1 ou 2 frases explicando:
-                - qual é o fenômeno principal,
-                - quem são os atores centrais,
-                - qual é o contexto geral da cobertura.
+                1-2 frases sobre o fenômeno, atores centrais e contexto.
 
                 Foco:
-                Escolha apenas uma das opções abaixo:
-                Fenômeno Social
-                Dinâmica Política/Institucional
-
-
-                Critérios para definir o foco:
-
-                - Escolha "Fenômeno Social" quando o centro da cobertura for um problema social, evento coletivo, comportamento social ou impacto na sociedade.
-                - Escolha "Dinâmica Política/Institucional" quando o centro for disputas de poder, decisões governamentais, articulações políticas ou funcionamento de instituições.
-
+                Escolha uma opção: Fenômeno Social | Dinâmica Política/Institucional
 
                 Textos para análise:
 

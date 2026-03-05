@@ -3,4 +3,4 @@ year_cutoff = 2999
 
 [word_limit]
 lower = 5
-upper = 10000
+upper = 1000

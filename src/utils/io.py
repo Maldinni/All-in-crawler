@@ -1,3 +1,4 @@
+import os
 import csv
 import h5py
 import numpy as np
@@ -166,3 +167,7 @@ def align_to_df(embeddings, urls, df):
     url_to_index = {url: idx for idx, url in enumerate(urls)}
     ordered_indices = [url_to_index[url] for url in df['canonical_url'].values]
     return embeddings[ordered_indices], urls[ordered_indices]
+
+def save_organized_clusters(df, output_folder):
+    output_path = os.path.join(output_folder, "articles_merged_cleaned_clustered_organized.csv")
+    df.to_csv(output_path, index=False)

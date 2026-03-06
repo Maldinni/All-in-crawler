@@ -80,3 +80,13 @@ def get_centroids(x, labels):
         centroids[i] = convert_to_cartesian(centroid)
 
     return centroids
+
+def get_representative_articles(centroid, cluster_embeddings, cluster_texts, k=5):
+
+    similarities = cluster_embeddings @ centroid
+
+    top_idx = np.argsort(similarities)[-k:]
+
+    selected_articles = cluster_texts[top_idx]
+
+    return selected_articles

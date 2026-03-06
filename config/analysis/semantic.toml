@@ -1,5 +1,5 @@
 [definition]
-max_article_number = 150
+max_article_number = 9
 required_fields = ['Palavras-chave', 'Título', 'Descrição', 'Foco']
 
 [distinction]
@@ -37,7 +37,7 @@ required_fields = [
         ]
 
 [llm]
-temperature = 0
+temperature = 0.1
 model_name = 'llama3'
 delay = 0.5
 retries = 5

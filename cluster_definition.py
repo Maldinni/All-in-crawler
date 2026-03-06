@@ -10,9 +10,11 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers.json import SimpleJsonOutputParser
 
 from src.utils.parsing import parse_args, load_config
-from src.utils.hypersphere import get_centroids
+from src.utils.hypersphere import get_representative_articles, get_centroids
 from src.utils.io import ensure_dirs, load_embedding_shards, align_to_df
-from src.utils.semantic import safe_dictionary_extraction, get_article_strings
+
+def truncate(text, max_chars=1300):
+    return text[:max_chars]
 
 def main():
 
@@ -20,30 +22,25 @@ def main():
     DEFINITION_PROMPT = PromptTemplate(
         input_variables=["articles"],
         template="""
-                Você receberá textos jornalísticos sobre um mesmo tema.
+                Leia os textos abaixo e identifique o tema principal.
 
-                Analise apenas o que está nos textos. Não faça inferências externas.
+                Use apenas informações dos textos.
 
-                Produza a saída assim:
+                Saída:
 
                 Palavras-chave:
-                - termo 1
-                - termo 2
-                - termo 3
-                - termo 4
-                - termo 5
+                - 
+                - 
+                - 
+                - 
+                - 
 
                 Título:
-                Frase curta que resuma o fenômeno central.
 
                 Descrição:
-                1-2 frases sobre o fenômeno, atores centrais e contexto.
+                1-2 frases.
 
-                Foco:
-                Escolha uma opção: Fenômeno Social | Dinâmica Política/Institucional
-
-                Textos para análise:
-
+                Textos:
                 {articles}
                 """,
     )
@@ -57,14 +54,17 @@ def main():
     required_fields = cfg['definition']['required_fields']
 
     llm = ChatOllama(
-        model="qwen3.5:27b",
+        model="qwen2.5:7b",
         temperature=cfg['llm']['temperature']
     )
 
-    csv_directory = f'{cfg["paths"]["processed"]}'
-    csv_file = 'articles_merged_cleaned_clustered.csv'
-    news_df = pd.read_csv(os.path.join(csv_directory, csv_file))
+    cluster_directory = Path(cfg["paths"]["processed"]) / "separated clusters"
+    cluster_files = sorted(glob(os.path.join(cluster_directory, "cluster_*.csv")))
     output_directory = f'{cfg["paths"]["output"]}'
+
+    news_file = Path(cfg["paths"]["processed"]) / "articles_merged_cleaned_clustered.csv"
+
+    news_df = pd.read_csv(news_file)
 
     cluster_csv_file = 'clusters_defined.csv'
     output_path = os.path.join(output_directory, cluster_csv_file)
@@ -79,63 +79,66 @@ def main():
     
     shard_directory = Path(cfg["paths"]["raw"]) / "shards_h5"
     files = glob(os.path.join(shard_directory, '*.h5'))
-    embeddings, urls = load_embedding_shards(files)
 
-    aligned_embeddings, aligned_urls = align_to_df(embeddings, urls, news_df)
+    embeddings, texts = load_embedding_shards(files)
 
-    # Free memory
-    del embeddings
-    del urls
+    aligned_embeddings, aligned_texts = align_to_df(
+        embeddings,
+        texts,
+        news_df
+    )
 
-    # Get the centroids of the clusters
-    centroids = get_centroids(aligned_embeddings, news_df['Cluster ID'].values)
-    centroid_similarities = centroids.dot(centroids.T) - np.eye(centroids.shape[0])
+    centroids = get_centroids(
+    aligned_embeddings,
+    news_df['Cluster ID'].values
+    )
 
-    # Get cluster labels
-    labels = news_df['Cluster ID'].values
-
-    # Get the abstracts
-    texts = news_df['text'].values
-
-    # Get the publication years of the articles
-    years = news_df['publish_date'].values
-
-    # Get the type of the articles
     #sources = news_df['source'].values
     definition_chain = DEFINITION_PROMPT | llm
 
     print("Iniciando processamento de clusters...")
 
-    for label, centroid in enumerate(centroids):
+    for cluster_file in cluster_files:
+
+        label = int(Path(cluster_file).stem.split("_")[1])
 
         if label in processed_clusters:
             continue
 
         print(f"Processando cluster {label}...")
 
-        cluster_embeddings = aligned_embeddings[labels == label]
-        cluster_articles = texts[labels == label]
+        cluster_df = pd.read_csv(cluster_file)
+
+        cluster_articles = cluster_df["text"].dropna().values
 
         number_of_articles = min(
             cfg['definition']['max_article_number'],
             len(cluster_articles)
         )
 
-        cluster_articles = get_article_strings(
-            centroid,
+        cluster_mask = news_df['Cluster ID'] == label
+
+        cluster_embeddings = aligned_embeddings[cluster_mask]
+
+        cluster_texts = news_df.loc[cluster_mask, "text"].values
+
+        cluster_articles = get_representative_articles(
+            centroids[label],
             cluster_embeddings,
-            cluster_articles,
+            cluster_texts,
             number_of_articles
         )
 
-        chain_input = {"articles": cluster_articles}
+        cluster_articles = [truncate(a) for a in cluster_articles]
+
+        chain_input = {"articles": "\n\n".join(cluster_articles)}
 
         raw_output = definition_chain.invoke(chain_input)
 
         with open(f"{output_directory}/cluster_{label}.txt", "w", encoding="utf-8") as f:
             f.write(raw_output.content)
 
-        print(f"Cluster {label} salvo como texto bruto.")
+        print(f"Cluster {label} salvo.")
 
 if __name__ == '__main__':
     main()

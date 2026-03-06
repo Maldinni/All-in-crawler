@@ -141,16 +141,16 @@ def load_embedding_shards(embeddings_files, disable_tqdm=False):
     """
 
     embeddings = []
-    urls = []
+    texts = []
 
     for file in tqdm(embeddings_files, disable=disable_tqdm):
-        embeddings_shard, urls_shard = load_embeddings_from_hdf5(file)
+        embeddings_shard, texts_shard = load_embeddings_from_hdf5(file)
         embeddings.append(embeddings_shard)
-        urls.extend(urls_shard)
+        texts.extend(texts_shard)
 
-    return np.concatenate(embeddings, axis=0), urls
+    return np.concatenate(embeddings, axis=0), texts
 
-def align_to_df(embeddings, urls, df):
+def align_to_df(embeddings, texts, df):
     """
     Aligns the order of embeddings and urls to the url order in the DataFrame.
 
@@ -163,10 +163,10 @@ def align_to_df(embeddings, urls, df):
     aligned_embeddings (np.ndarray): The aligned embeddings.
     aligned_urls (np.ndarray): The aligned urls.
     """
-    urls = np.array(urls)
-    url_to_index = {url: idx for idx, url in enumerate(urls)}
-    ordered_indices = [url_to_index[url] for url in df['canonical_url'].values]
-    return embeddings[ordered_indices], urls[ordered_indices]
+    texts = np.array(texts)
+    text_to_index = {text: idx for idx, text in enumerate(texts)}
+    ordered_indices = [text_to_index[text] for text in df['text'].values]
+    return embeddings[ordered_indices], texts[ordered_indices]
 
 def save_organized_clusters(df, output_folder):
     output_path = os.path.join(output_folder, "articles_merged_cleaned_clustered_organized.csv")

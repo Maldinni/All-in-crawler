@@ -40,6 +40,9 @@ def main():
                 Descrição:
                 1-2 frases.
 
+                Foco:
+                Crimes e segurança pública | Acidentes e desastres | Política nacional | Política local | Economia e mercado financeiro | Cultura e entretenimento | Esportes | Ciência e tecnologia | Meio ambiente
+
                 Textos:
                 {articles}
                 """,

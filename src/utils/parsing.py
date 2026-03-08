@@ -1,4 +1,5 @@
 import argparse
+import re
 import tomllib
 from pathlib import Path
 from typing import Any, Dict
@@ -58,3 +59,8 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
         cfg["scraping"]["max_articles_per_source"] = args.max_articles_per_source
 
     return cfg
+
+def extract_cluster_id(filename):
+
+    match = re.search(r"(\d+)", filename)
+    return int(match.group(1))

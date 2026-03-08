@@ -166,3 +166,21 @@ def load_embedding_shards(embeddings_files, disable_tqdm=False):
         urls.extend(urls_shard)
 
     return np.concatenate(embeddings, axis=0), urls
+
+def align_to_df(embeddings, urls, df):
+    """
+    Aligns the order of embeddings and urls to the url order in the DataFrame.
+
+    Parameters:
+    embeddings (np.ndarray): The embeddings to align.
+    urls (np.ndarray): The urls to align.
+    df (pd.DataFrame): The DataFrame to align to.
+
+    Returns:
+    aligned_embeddings (np.ndarray): The aligned embeddings.
+    aligned_urls (np.ndarray): The aligned urls.
+    """
+    urls = np.array(urls)
+    url_to_index = {url: idx for idx, url in enumerate(urls)}
+    ordered_indices = [url_to_index[url] for url in df['canonical_url'].values]
+    return embeddings[ordered_indices], urls[ordered_indices]

@@ -1,6 +1,7 @@
 import tomllib
 import faiss
 from tqdm import tqdm
+import numpy as np
 
 def estimate_memory_usage(num_points, k):
     """
@@ -55,6 +56,7 @@ def construct_knn_graph(embeddings, k):
     - edges: list of tuples
     - weights: list of floats
     """
+    embeddings = embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
     num_points, dim = embeddings.shape
 
     # Build the FAISS index
@@ -71,9 +73,11 @@ def construct_knn_graph(embeddings, k):
     print("Constructing edge list...")
     edge_set = set()
     weights = []
+    SIM_THRESHOLD = 0.5  # ajuste entre 0.7–0.85
+
     for i in tqdm(range(num_points)):
         for neighbor_idx, distance in zip(indices[i], distances[i]):
-            if neighbor_idx != i:
+            if neighbor_idx != i and distance >= SIM_THRESHOLD:
                 edge = tuple(sorted((i, neighbor_idx)))
                 edge_set.add((edge, distance))
 

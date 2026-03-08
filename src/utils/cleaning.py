@@ -9,6 +9,19 @@ def count_words(text):
         return 0
     return len(text.split())
 
+def truncate_text(text, max_words=250):
+    """
+    Limita o texto a no máximo max_words palavras.
+    """
+    if not isinstance(text, str):
+        return text
+
+    words = text.split()
+    if len(words) <= max_words:
+        return text
+    else:
+        return " ".join(words[:max_words])
+
 def remove_emojis(text):
     if not isinstance(text, str):
         return text
@@ -36,8 +49,12 @@ def clean_dataframe(df, config):
     df = df[df['text'].str.strip() != ""]
 
     df['text'] = df['text'].apply(remove_emojis)
+    df['text'] = df['text'].apply(lambda x: truncate_text(x, max_words=250))
     df['title'] = df['title'].apply(remove_emojis)
     df['authors'] = df['authors'].apply(remove_emojis)
+
+    # Agora a contagem de palavras vai considerar no máximo 250
+    df['word_count'] = df['text'].apply(count_words)
 
     #df['publish_date'] = pd.to_datetime(df['publish_date'], errors='coerce')
     #df = df[df['publish_date'].notnull()]
@@ -84,7 +101,7 @@ def sort_dataframe(df):
     - df: pandas.DataFrame
 
     Returns:
-    - df: pandas.DataFrame
+    - df: pandas.DataFramea
     """
 
     df = df.sort_values(by=['publish_date', 'source'])

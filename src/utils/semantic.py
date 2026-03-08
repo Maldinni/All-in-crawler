@@ -60,7 +60,7 @@ def safe_dictionary_extraction(required_fields, chain_input, chain, retries,
 
 def get_article_strings(centroid, embeddings, abstracts, number_of_abstracts):
     """
-    Get the abstract strings that are most similar to the centroid.
+    Get the strings that are most similar to the centroid.
 
     Parameters:
     - centroid: np.array, the centroid of the cluster.

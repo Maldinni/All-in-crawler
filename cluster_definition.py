@@ -7,9 +7,9 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
 
-from src.utils.parsing import parse_args, load_config,extract_cluster_id
+from src.utils.parsing import parse_args, load_config, extract_cluster_id, load_and_parse_cluster_file
 from src.utils.hypersphere import get_representative_articles, get_centroids
-from src.utils.io import ensure_dirs, load_embedding_shards, load_and_parse_cluster_file, align_to_df
+from src.utils.io import ensure_dirs, load_embedding_shards, align_to_df
 
 def truncate(text, max_chars=1300):
     return text[:max_chars]

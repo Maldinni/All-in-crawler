@@ -21,8 +21,8 @@ required_fields = [
                  ]
 
 [dimensions]
-max_article_number = 200
-older_cutoff = 2015
+max_article_number = 9
+older_cutoff = 2025
 recent_cutoff = 2026
 required_fields = [
                 'Dimensão 1 - Posicionamento Social e Político',

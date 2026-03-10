@@ -38,6 +38,7 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
     initial_embedding_file = load_toml(args.initial_embedding)
     graph_construction_file = load_toml(args.clustering)
     cluster_definition_file = load_toml(args.semantic)
+    trends_file = load_toml(args.semantic)
 
 
     cfg = {
@@ -53,6 +54,7 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
         "community_detection": graph_construction_file["community_detection"],
         "definition": cluster_definition_file["definition"],
         "llm": cluster_definition_file["llm"],
+        "trends": trends_file["trends"]
     }
 
     if args.max_articles_per_source is not None:
@@ -115,3 +117,15 @@ def parse_distinction_file(filepath):
     matches = re.findall(r"- (.*)", text)
 
     return "; ".join(matches)
+
+import re
+
+def clean_llm_text(text):
+
+    text = re.sub(r"#+", "", text)      
+    text = re.sub(r"\*\*", "", text)    
+    text = re.sub(r"- ", "", text)       
+    text = text.replace("\n", " ")       
+    text = re.sub(r"\s+", " ", text)     
+
+    return text.strip()

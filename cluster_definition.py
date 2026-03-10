@@ -1,48 +1,54 @@
 import os
-import numpy as np
 import pandas as pd
-from glob import glob
 from pathlib import Path
+from tqdm import tqdm
 
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
 
-from src.utils.parsing import parse_args, load_config, extract_cluster_id, load_and_parse_cluster_file
-from src.utils.hypersphere import get_representative_articles, get_centroids
-from src.utils.io import ensure_dirs, load_embedding_shards, align_to_df
+from src.utils.parsing import parse_args, load_config
+from src.utils.io import ensure_dirs
 
-def truncate(text, max_chars=1300):
+
+def truncate(text, max_chars=2000):
     return text[:max_chars]
 
+
 def main():
-# Define prompt templates
-    DEFINITION_PROMPT = PromptTemplate(
-        input_variables=["articles"],
+
+    TRENDS_PROMPT = PromptTemplate(
+        input_variables=["title", "date", "old_news", "recent_news"],
         template="""
-                Leia os textos abaixo e identifique o tema principal.
+            Compare dois conjuntos de textos sobre o tema "{title}".
 
-                Use apenas informações dos textos.
+            Conjunto 1: textos antigos (antes de {date})
+            Conjunto 2: textos recentes (depois de {date})
 
-                Saída:
+            Identifique diferenças entre os dois conjuntos.
 
-                Palavras-chave:
-                - 
-                - 
-                - 
-                - 
-                - 
+            Procure por:
+            - Narrativas que aparecem ou ganham destaque nos textos recentes
+            - Atores que aparecem ou ganham destaque nos textos recentes
+            - Narrativas que eram comuns nos textos antigos mas aparecem menos nos recentes
+            - Atores que eram comuns nos textos antigos mas aparecem menos nos recentes
 
-                Título:
+            Retorne o resultado em JSON:
 
-                Descrição:
-                1-2 frases.
+            {
+            "Narrativas Emergentes": "lista separada por ponto e vírgula com breves descrições",
+            "Atores Emergentes": "lista separada por ponto e vírgula com breves descrições",
+            "Narrativas em Declínio": "lista separada por ponto e vírgula com breves descrições",
+            "Atores em Declínio": "lista separada por ponto e vírgula com breves descrições"
+            }
 
-                Foco:
-                Crimes e segurança pública | Acidentes e desastres | Política nacional | Política local | Economia e mercado financeiro | Cultura e entretenimento | Esportes | Ciência e tecnologia | Meio ambiente
+            Use apenas informações presentes nos textos.
 
-                Textos:
-                {articles}
-                """,
+            Textos antigos:
+            {old_news}
+
+            Textos recentes:
+            {recent_news}
+""",
     )
 
     args = parse_args()
@@ -51,175 +57,88 @@ def main():
     paths = cfg["paths"]
     ensure_dirs(paths["raw"], paths["processed"], paths["checkpoints"], paths["output"])
 
-    required_fields = cfg['definition']['required_fields']
+    num_news_per_set = cfg['trends']['max_abstract_number'] // 2
+    recent_cutoff = cfg['trends']['recent_cutoff']
+    older_cutoff = cfg['trends']['older_cutoff']
 
     llm = ChatOllama(
-        model="qwen2.5:7b",
-        temperature=cfg['llm']['temperature']
+        model=cfg["llm"]["model_name"],
+        temperature=cfg["llm"]["temperature"]
     )
 
-    cluster_directory = Path(cfg["paths"]["processed"]) / "separated clusters"
-    cluster_files = sorted(glob(os.path.join(cluster_directory, "cluster_*.csv")))
-    output_directory = f'{cfg["paths"]["output"]}'
+    trends_chain = TRENDS_PROMPT | llm
 
-    news_file = Path(cfg["paths"]["processed"]) / "articles_merged_cleaned_clustered.csv"
+    processed_path = Path(cfg["paths"]["processed"])
+    output_path = Path(cfg["paths"]["output"]) / "cluster_trends"
+
+    os.makedirs(output_path, exist_ok=True)
+
+    news_file = processed_path / "articles_merged_cleaned_clustered.csv"
+    clusters_file = processed_path / "clusters_defined.csv"
 
     news_df = pd.read_csv(news_file)
+    cluster_df = pd.read_csv(clusters_file)
 
-    cluster_csv_file = 'clusters_defined.csv'
-    output_path = os.path.join(output_directory, cluster_csv_file)
+    news_df["date"] = pd.to_datetime(news_df["date"])
 
-    if os.path.exists(output_path):
-        cluster_definitions_df = pd.read_csv(output_path)
-        cluster_definitions = cluster_definitions_df.to_dict('records')
-        processed_clusters = set(cluster_definitions_df['Cluster ID'].values.tolist())
-    else:
-        cluster_definitions = []
-        processed_clusters = set()
-    
-    shard_directory = Path(cfg["paths"]["raw"]) / "shards_h5"
-    files = glob(os.path.join(shard_directory, '*.h5'))
-
-    embeddings, texts = load_embedding_shards(files)
-
-    aligned_embeddings, aligned_texts = align_to_df(
-        embeddings,
-        texts,
-        news_df
-    )
-
-    centroids = get_centroids(
-    aligned_embeddings,
-    news_df['Cluster ID'].values
-    )
-
-    centroid_similarities = centroids.dot(centroids.T) - np.eye(centroids.shape[0])
-
-    #sources = news_df['source'].values
-    definition_chain = DEFINITION_PROMPT | llm
+    labels = news_df["Cluster ID"].unique()
 
     print("Iniciando processamento de clusters...")
 
-    for cluster_file in cluster_files:
-
-        label = int(Path(cluster_file).stem.split("_")[1])
-
-        if label in processed_clusters:
-            continue
+    for label in tqdm(labels):
 
         print(f"Processando cluster {label}...")
 
-        cluster_df = pd.read_csv(cluster_file)
+        older_news_list = news_df[
+            (news_df["Cluster ID"] == label) &
+            (news_df["date"] >= older_cutoff) &
+            (news_df["date"] < recent_cutoff)
+        ]["texts"].dropna().values
 
-        cluster_articles = cluster_df["text"].dropna().values
+        n_old = min(num_news_per_set, len(older_news_list))
 
-        number_of_articles = min(
-            cfg['definition']['max_article_number'],
-            len(cluster_articles)
+        if n_old == 0:
+            continue
+
+        older_news = "\n\n".join(
+            [truncate(t) for t in older_news_list[:n_old]]
         )
 
-        cluster_mask = news_df['Cluster ID'] == label
+        recent_df = news_df[
+            (news_df["Cluster ID"] == label) &
+            (news_df["date"] >= recent_cutoff)
+        ].sort_values("date", ascending=False)
 
-        cluster_embeddings = aligned_embeddings[cluster_mask]
+        recent_news_list = recent_df["texts"].dropna().values[:num_news_per_set]
 
-        cluster_texts = news_df.loc[cluster_mask, "text"].values
+        if len(recent_news_list) == 0:
+            continue
 
-        cluster_articles = get_representative_articles(
-            centroids[label],
-            cluster_embeddings,
-            cluster_texts,
-            number_of_articles
+        recent_news = "\n\n".join(
+            [truncate(t) for t in recent_news_list]
         )
 
-        cluster_articles = [truncate(a) for a in cluster_articles]
+        title_row = cluster_df[cluster_df["Cluster ID"] == label]
 
-        chain_input = {"articles": "\n\n".join(cluster_articles)}
+        if title_row.empty:
+            cluster_title = f"Cluster {label}"
+        else:
+            cluster_title = title_row.iloc[0]["Title"]
 
-        raw_output = definition_chain.invoke(chain_input)
+        chain_input = {
+            "title": cluster_title,
+            "date": str(recent_cutoff),
+            "old_news": older_news,
+            "recent_news": recent_news
+        }
 
-        with open(f"{output_directory}/cluster_{label}.txt", "w", encoding="utf-8") as f:
+        raw_output = trends_chain.invoke(chain_input)
+
+        with open(output_path / f"cluster_{label}.txt", "w", encoding="utf-8") as f:
             f.write(raw_output.content)
 
         print(f"Cluster {label} salvo.")
 
-def json_converter():
-
-    args = parse_args()
-    cfg = load_config(args)
-
-    paths = cfg["paths"]
-    ensure_dirs(paths["raw"], paths["processed"], paths["checkpoints"], paths["output"])
-
-    clusters_directory = f'{cfg["paths"]["output"]}'
-    output_directory = f'{cfg["paths"]["processed"]}'
-
-    cluster_json_file = 'clusters_defined.json'
-    cluster_csv_file = 'clusters_defined.csv'
-    dataset_file = Path(cfg["paths"]["processed"]) / "articles_merged_cleaned_clustered.csv"
-
-    shard_directory = Path(cfg["paths"]["raw"]) / "shards_h5"
-    shards_files = glob(os.path.join(shard_directory, '*.h5'))
-
-    files = glob(os.path.join(clusters_directory, "*.txt"))
-
-    df = pd.read_csv(dataset_file)
-
-    cluster_sizes = df.groupby("Cluster ID").size()
-
-    cluster_records = []
-
-    embeddings, texts = load_embedding_shards(shards_files)
-
-    aligned_embeddings, aligned_texts = align_to_df(
-        embeddings,
-        texts,
-        df
-    )
-
-    centroids = get_centroids(
-        aligned_embeddings,
-        df['Cluster ID'].values
-    )
-
-    centroid_similarities = centroids.dot(centroids.T) - np.eye(centroids.shape[0])
-
-    for file in files:
-
-        cluster_id = extract_cluster_id(file)
-
-        keywords, title, description, focus = load_and_parse_cluster_file(file)
-
-        most_similar = np.argmax(centroid_similarities[cluster_id])
-        similarity = centroid_similarities[cluster_id, most_similar]
-
-        record = {
-            "Cluster ID": cluster_id,
-            "Title": title,
-            "Size": int(cluster_sizes.get(cluster_id, 0)),
-            "Keywords": "; ".join(keywords),
-            "Description": description,
-            "Focus": focus,
-            "Most Similar Cluster": int(most_similar),
-            "Similarity": float(similarity)
-        }
-
-        cluster_records.append(record)
-
-    clusters_df = pd.DataFrame(cluster_records)
-
-    clusters_df = clusters_df.sort_values("Cluster ID")
-
-    clusters_df.to_csv(os.path.join(output_directory, cluster_csv_file), index=False)
-
-    clusters_df.to_json(
-        os.path.join(output_directory, cluster_json_file),
-        orient="records",
-        indent=2,
-        force_ascii=False
-    )
-
-    print("Dataset criado com sucesso!")
 
 if __name__ == '__main__':
-    #main()
-    json_converter()
+    main()

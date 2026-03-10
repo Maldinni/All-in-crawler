@@ -10,8 +10,8 @@ required_fields = ['Características Distintivas']
 required_fields = ['Questões em Aberto']
 
 [trends]
-max_article_number = 200
-older_cutoff = 2020
+max_article_number = 9
+older_cutoff = 2025
 recent_cutoff = 2026
 required_fields = [
                  'Narrativas Emergentes',

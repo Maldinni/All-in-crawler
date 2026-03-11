@@ -35,14 +35,8 @@ def main():
         # Salva em HDF5
         news_list = []
 
-        for i in range(len(obj.urls)):
+        for i in range(len(obj.texts)):
             article = {
-                "source": obj.sources[i],
-                "domain": obj.domains[i],
-                "canonical_url": obj.urls[i],
-                "title": obj.titles[i],
-                "authors": obj.authors[i],
-                "publish_date": obj.publish_dates[i],
                 "text": obj.texts[i],
                 "embedding": obj.embeddings[i] if i < len(obj.embeddings) else None
             }

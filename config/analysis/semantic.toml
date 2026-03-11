@@ -1,17 +1,17 @@
 [definition]
-max_article_number = 150
+max_article_number = 9
 required_fields = ['Palavras-chave', 'Título', 'Descrição', 'Foco']
 
 [distinction]
-max_article_number = 150
+max_article_number = 9
 required_fields = ['Características Distintivas']
 
 [questions]
 required_fields = ['Questões em Aberto']
 
 [trends]
-max_article_number = 200
-older_cutoff = 2020
+max_article_number = 9
+older_cutoff = 2025
 recent_cutoff = 2026
 required_fields = [
                  'Narrativas Emergentes',
@@ -21,8 +21,8 @@ required_fields = [
                  ]
 
 [dimensions]
-max_article_number = 200
-older_cutoff = 2015
+max_article_number = 9
+older_cutoff = 2025
 recent_cutoff = 2026
 required_fields = [
                 'Dimensão 1 - Posicionamento Social e Político',
@@ -37,7 +37,7 @@ required_fields = [
         ]
 
 [llm]
-temperature = 0
-model_name = 'llama3'
+temperature = 0.1
+model_name = 'qwen2.5:7b'
 delay = 0.5
 retries = 5

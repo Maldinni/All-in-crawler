@@ -1,3 +1,5 @@
+import os
+import re
 import csv
 import h5py
 import numpy as np
@@ -70,18 +72,6 @@ def save_news_to_hdf5(news_list, filename, disable_tqdm=False):
         n = len(news_list)
 
         # String datasets
-        sources = file.create_dataset('source', (n,),
-                                       dtype=h5py.string_dtype())
-        domains = file.create_dataset('domain', (n,),
-                                       dtype=h5py.string_dtype())
-        urls = file.create_dataset('canonical_url', (n,),
-                                    dtype=h5py.string_dtype())
-        titles = file.create_dataset('title', (n,),
-                                      dtype=h5py.string_dtype())
-        authors = file.create_dataset('authors', (n,),
-                                       dtype=h5py.string_dtype())
-        publish_dates = file.create_dataset('publish_date', (n,),
-                                             dtype=h5py.string_dtype())
         texts = file.create_dataset('text', (n,),
                                       dtype=h5py.string_dtype())
 
@@ -92,12 +82,6 @@ def save_news_to_hdf5(news_list, filename, disable_tqdm=False):
                                total=n,
                                disable=disable_tqdm):
 
-            sources[i] = str(article["source"]) if article["source"] else ""
-            domains[i] = str(article["domain"]) if article["domain"] else ""
-            urls[i] = str(article["canonical_url"]) if article["canonical_url"] else ""
-            titles[i] = str(article["title"]) if article["title"] else ""
-            authors[i] = str(article["authors"]) if article["authors"] else ""
-            publish_dates[i] = str(article["publish_date"]) if article["publish_date"] else ""
             texts[i] = str(article["text"]) if article["text"] else ""
 
             # Se tiver embedding
@@ -121,16 +105,16 @@ def load_embeddings_from_hdf5(filename):
 
     with h5py.File(filename, "r") as f:
 
-        # 🔹 Carrega URLs (identificador)
-        urls = f["canonical_url"][:]
-        urls = [
+        # Carrega URLs (identificador)
+        texts = f["text"][:]
+        texts = [
             u.decode("utf-8") if isinstance(u, bytes) else u
-            for u in urls
+            for u in texts
         ]
 
-        total_articles = len(urls)
+        total_articles = len(texts)
 
-        # 🔹 Carrega embeddings
+        # Carrega embeddings
         embedding_group = f["embeddings"]
 
         # Pega dimensão do primeiro embedding
@@ -142,7 +126,7 @@ def load_embeddings_from_hdf5(filename):
         for i in range(total_articles):
             embeddings[i] = np.array(embedding_group[str(i)])
 
-    return embeddings, urls
+    return embeddings, texts
 
 def load_embedding_shards(embeddings_files, disable_tqdm=False):
     """
@@ -158,16 +142,16 @@ def load_embedding_shards(embeddings_files, disable_tqdm=False):
     """
 
     embeddings = []
-    urls = []
+    texts = []
 
     for file in tqdm(embeddings_files, disable=disable_tqdm):
-        embeddings_shard, urls_shard = load_embeddings_from_hdf5(file)
+        embeddings_shard, texts_shard = load_embeddings_from_hdf5(file)
         embeddings.append(embeddings_shard)
-        urls.extend(urls_shard)
+        texts.extend(texts_shard)
 
-    return np.concatenate(embeddings, axis=0), urls
+    return np.concatenate(embeddings, axis=0), texts
 
-def align_to_df(embeddings, urls, df):
+def align_to_df(embeddings, texts, df):
     """
     Aligns the order of embeddings and urls to the url order in the DataFrame.
 
@@ -180,7 +164,11 @@ def align_to_df(embeddings, urls, df):
     aligned_embeddings (np.ndarray): The aligned embeddings.
     aligned_urls (np.ndarray): The aligned urls.
     """
-    urls = np.array(urls)
-    url_to_index = {url: idx for idx, url in enumerate(urls)}
-    ordered_indices = [url_to_index[url] for url in df['canonical_url'].values]
-    return embeddings[ordered_indices], urls[ordered_indices]
+    texts = np.array(texts)
+    text_to_index = {text: idx for idx, text in enumerate(texts)}
+    ordered_indices = [text_to_index[text] for text in df['text'].values]
+    return embeddings[ordered_indices], texts[ordered_indices]
+
+def save_organized_clusters(df, output_folder):
+    output_path = os.path.join(output_folder, "articles_merged_cleaned_clustered_organized.csv")
+    df.to_csv(output_path, index=False)

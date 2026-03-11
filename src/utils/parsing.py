@@ -1,4 +1,5 @@
 import argparse
+import re
 import tomllib
 from pathlib import Path
 from typing import Any, Dict
@@ -37,6 +38,8 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
     initial_embedding_file = load_toml(args.initial_embedding)
     graph_construction_file = load_toml(args.clustering)
     cluster_definition_file = load_toml(args.semantic)
+    trends_file = load_toml(args.semantic)
+    dimensions_file = load_toml(args.semantic)
 
 
     cfg = {
@@ -52,9 +55,79 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
         "community_detection": graph_construction_file["community_detection"],
         "definition": cluster_definition_file["definition"],
         "llm": cluster_definition_file["llm"],
+        "trends": trends_file["trends"],
+        "dimensions": dimensions_file["dimensions"]
     }
 
     if args.max_articles_per_source is not None:
         cfg["scraping"]["max_articles_per_source"] = args.max_articles_per_source
 
     return cfg
+
+def extract_cluster_id(filename):
+
+    match = re.search(r"(\d+)", filename)
+    return int(match.group(1))
+
+def load_and_parse_cluster_file(filepath):
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    # keywords
+    keywords_section = re.search(
+        r"Palavras-chave:(.*?)Título:",
+        text,
+        re.S
+    )
+
+    keywords = []
+    if keywords_section:
+        keywords = re.findall(r"- (.*)", keywords_section.group(1))
+
+    # title
+    title_match = re.search(
+        r"Título:\s*(.*?)\n",
+        text
+    )
+
+    title = title_match.group(1).strip() if title_match else ""
+
+    # description
+    desc_match = re.search(
+        r"Descrição:\s*(.*?)\n\s*Foco:",
+        text,
+        re.S
+    )
+
+    description = desc_match.group(1).strip() if desc_match else ""
+
+    focus_match = re.search(
+        r"Foco:\s*(.*)",
+        text
+    )
+
+    focus = focus_match.group(1).strip() if focus_match else ""
+
+    return keywords, title, description, focus
+
+def parse_distinction_file(filepath):
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    matches = re.findall(r"- (.*)", text)
+
+    return "; ".join(matches)
+
+import re
+
+def clean_llm_text(text):
+
+    text = re.sub(r"#+", "", text)      
+    text = re.sub(r"\*\*", "", text)    
+    text = re.sub(r"- ", "", text)       
+    text = text.replace("\n", " ")       
+    text = re.sub(r"\s+", " ", text)     
+
+    return text.strip()

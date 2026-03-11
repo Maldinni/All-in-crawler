@@ -22,7 +22,7 @@ def main():
 
     print('loading graph')
     G = ig.Graph.Read(graph_file, format='graphml')
-    urls = G.vs['url']
+    texts = G.vs['texts']
 
     print(
         'running Leiden community detection for different resolution parameters'
@@ -71,11 +71,11 @@ def main():
         weights='weight',
         resolution_parameter=best_resolution_parameter)
 
-    url_cluster = dict(zip(urls, partition.membership))
+    text_cluster = dict(zip(texts, partition.membership))
 
     print('saving cluster')
     df = pd.read_csv(csv_file)
-    df['Cluster ID'] = df['canonical_url'].map(url_cluster)
+    df['Cluster ID'] = df['text'].map(text_cluster)
 
     new_csv_file = csv_file.replace('.csv', '_clustered.csv')
     df.to_csv(new_csv_file, index=False)

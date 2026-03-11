@@ -65,12 +65,6 @@ def main():
         embedded_texts = embedding_model.embed_documents(texts)
 
         # Store PMIDs and embeddings
-        text_embeddings.urls = selection['canonical_url'].tolist()
-        text_embeddings.sources = selection['source'].tolist()
-        text_embeddings.domains = selection['domain'].tolist()
-        text_embeddings.titles = selection['title'].tolist()
-        text_embeddings.authors = selection['authors'].fillna("").tolist()
-        text_embeddings.publish_dates = selection['publish_date'].tolist()
         text_embeddings.texts = selection['text'].tolist()
         text_embeddings.embeddings = embedded_texts
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def load_results(path="data/clusters_defined_distinguished_trends_assessed.csv"):
+def load_results(path):
     return pd.read_csv(path)
 
 

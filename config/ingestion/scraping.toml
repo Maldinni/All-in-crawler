@@ -1,11 +1,11 @@
 [scraping]
 sleep_time = 0.5
-num_attempts = 5
+num_attempts = 1
 timeout_sec = 8
 user_agent = "Mozilla/5.0 (compatible; AllInCrawler/1.0)"
-max_articles_per_source = 1
+max_articles_per_source = 40
 
 
 [sharding]
-items_per_shard = 200
+items_per_shard = 40
 format = "csv" # ou "jsonl"

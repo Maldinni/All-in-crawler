@@ -221,5 +221,5 @@ def json_converter():
     print("Dataset criado com sucesso!")
 
 if __name__ == '__main__':
-    #main()
+    main()
     json_converter()

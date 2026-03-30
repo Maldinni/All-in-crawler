@@ -1,4 +1,24 @@
 [[sources]]
+name = "Conecta Piauí"
+type = "listing"
+url = "https://conectapiaui.com.br/ultimas-noticias/"
+allow_domains = ["conectapiaui.com.br"]
+link_selector = "a[href]"
+allow_url_patterns = ["/noticia/"]
+deny_url_patterns = [
+  "/institucional/", "/tudo-sobre/", "/tabelas/", "/tv-",
+  "/ultimas-noticias/?", "/ultimas-noticias/?page=",
+  "/ultimas-noticias/?$", "/ultimas-noticias/$",
+  "whatsapp.com", "wa.me", "twitter.com"
+]
+
+[sources.pagination]
+mode = "query"
+page_param = "page"
+start = 1
+end = 1000
+
+[[sources]]
 name = "G1 Piauí"
 type = "listing"
 url = "https://g1.globo.com/pi/piaui/ultimas-noticias/"

@@ -1,0 +1,27 @@
+### Narrativas em Alta:
+- **Crimes e Delitos**: Os textos recentes destacam mais casos de crimes e delitos, como o uso de spray de pimenta por policiais em situações não-urgentes e o furto de combustível de ônibus escolares. Os textos antigos também mencionam crimes, mas em menor escala.
+- **Multas e Fiscalização**: Há uma maior ênfase nos textos recentes sobre a aplicação de multas por descarte irregular de resíduos, com detalhes sobre a distribuição geográfica e a gravidade das infrações.
+
+### Atores em Alta:
+- **Policiais e Forças de Segurança**: Os textos recentes destacam mais ações de policiais e forças de segurança, como o uso de spray de pimenta em situações não-urgentes.
+- **Empresários e Administração Pública**: Os textos recentes mencionam mais casos envolvendo empresários e a administração pública, como o fechamento de postos de combustíveis durante a Operação Carbono Oculto 86.
+
+### Narrativas em Baixa:
+- **Crimes e Corrupção Governamental**: Os textos antigos abordam mais casos de corrupção governamental, como o credenciamento para compra de combustível suspenso por suspeitas de irregularidades. Os textos recentes mencionam menos casos de corrupção governamental.
+- **Restituições Fiscais**: Os textos antigos mencionam a restituição do IRPF, enquanto os textos recentes não abordam este tema.
+
+### Atores em Baixa:
+- **Prefeituras e Autarquias**: Os textos antigos mencionam mais casos envolvendo prefeituras e autarquias, como o credenciamento para compra de combustível. Os textos recentes mencionam menos casos envolvendo estas entidades.
+- **Contribuintes e Restituições**: Os textos antigos mencionam mais ações relacionadas a contribuintes e restituições fiscais, enquanto os textos recentes não abordam este tema.
+
+### Textos Antigos:
+- **16/12/2025**: Suspensão do credenciamento para compra de combustível em Barras devido a suspeitas de irregularidades.
+- **17/12/2025**: Preso motorista que abasteceu carro furtado e fugiu sem pagar.
+- **19/12/2025**: Fechamento de postos de combustíveis durante a Operação Carbono Oculto 86.
+- **20/12/2025**: Preso homem suspeito de furtar combustível de ônibus escolares em Piripiri.
+
+### Textos Recentes:
+- **20/01/2026**: Uso de spray de pimenta por policiais em situações não-urgentes.
+- **12/01/2026**: Preso homem suspeito de furtar combustível de ônibus escolares em Piripiri.
+- **12/01/2026**: Multas aplicadas pela Prefeitura de Teresina por descarte irregular de lixo.
+- **12/01/2026**: Aplicação de multas por descarte irregular de resíduos no Programa Lixo Zero.

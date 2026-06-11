@@ -1,0 +1,33 @@
+Com base na análise dos textos fornecidos, podemos identificar as seguintes diferenças entre os conjuntos de textos antigos e recentes sobre o tema "Inovações e Desenvolvimentos em Piauí":
+
+### Narrativas em alta:
+- **Conjunto recente:** Enfatiza a inovação e o bem-estar dos bebês prematuros, destacando iniciativas humanizadas e tecnológicas na saúde.
+- **Conjunto antigo:** Foca na inovação tecnológica, especialmente na área de Inteligência Artificial, e na política social, como o Auxílio-Creche.
+
+### Atores em alta:
+- **Conjunto recente:** Maternidade Dona Evangelina Rosa, pediatras, e a iniciativa humanizada de confeccionar redinhas para bebês prematuros.
+- **Conjunto antigo:** Governo do Piauí, Universidade Federal do Piauí (Ufpi), Universidade Estadual do Piauí (Uespi), e o governador Rafael Fonteles.
+
+### Narrativas em baixa:
+- **Conjunto recente:** Não há evidências claras de narrativas em baixa.
+- **Conjunto antigo:** Não há evidências claras de narrativas em baixa.
+
+### Atores em baixa:
+- **Conjunto recente:** Não há evidências claras de atores em baixa.
+- **Conjunto antigo:** Não há evidências claras de atores em baixa.
+
+### Textos antigos:
+- **Narrativas:** O texto destaca a inovação tecnológica com o lançamento do modelo de Inteligência Artificial SoberanIA, desenvolvido pelo Governo do Piauí, e a importância da política social, como o Auxílio-Creche, oferecido pela Uespi.
+- **Atores:** O texto enfatiza o governador Rafael Fonteles, o Ministério da Ciência, Tecnologia e Inovação (MCTI), a Universidade Federal do Piauí (Ufpi), e a Universidade Estadual do Piauí (Uespi).
+
+### Textos recentes:
+- **Narrativas:** O texto destaca a inovação na área de saúde, com a utilização de redinhas para bebês prematuros na Nova Maternidade Dona Evangelina Rosa, em Teresina.
+- **Atores:** O texto enfatiza a Maternidade Dona Evangelina Rosa, a pediatra Marina Targa, e a iniciativa humanizada de confeccionar redinhas para bebês prematuros.
+
+### Resumo:
+- **Narrativas em alta:** Inovação tecnológica e humanizada na saúde.
+- **Atores em alta:** Maternidade Dona Evangelina Rosa, pediatras, e governantes.
+- **Narrativas em baixa:** Não identificadas.
+- **Atores em baixa:** Não identificados.
+
+Essa análise mostra uma transição do foco em inovação tecnológica e política social para uma ênfase maior na inovação humanizada na área de saúde.

@@ -1,0 +1,18 @@
+### Narrativas em Alta:
+- **Vacinação**: Em textos recentes, há uma ênfase maior na vacinação contra doenças como dengue e vírus sincicial respiratório (VSR). Os textos recentes destacam a chegada de novas vacinas e a capacitação das equipes de saúde para aplicá-las.
+- **Emergências Ambientais**: A seca no Piauí é um tema recorrente nos textos antigos, enquanto nos textos recentes, a atenção se volta para a qualidade da água nas praias do Litoral de São Paulo.
+
+### Atores em Alta:
+- **Vacinas**: A Anvisa e o Instituto Butantan são mencionados como importantes atores na produção e aprovação de vacinas.
+- **Vigilância Epidemiológica**: Em textos recentes, a Vigilância Epidemiológica é destacada como uma entidade crucial na identificação e resposta a emergências de saúde pública, como a meningite meningocócica em Maceió.
+
+### Narrativas em Baixa:
+- **Dengue**: Nos textos recentes, a dengue não é abordada com a mesma frequência e gravidade que nos textos antigos, possivelmente devido à disponibilidade de uma nova vacina.
+- **Seca no Piauí**: O tema da seca no Piauí é menos presente nos textos recentes, que se concentram mais em outros problemas de saúde.
+
+### Atores em Baixa:
+- **Cetesb**: Embora mencionada nos textos recentes, a Companhia Ambiental do Estado de São Paulo (Cetesb) não é tão centralizada como nos textos antigos, que focavam mais na qualidade da água nas praias.
+- **Ministério da Saúde Índia**: Os textos recentes não abordam a situação do vírus Nipah na Índia, que era um tema importante nos textos antigos.
+
+### Conclusão:
+Os textos recentes mostram uma mudança na ênfase das narrativas e atores, com uma maior atenção para a vacinação e a vigilância epidemiológica, enquanto temas como a dengue e a seca no Piauí recebem menos destaque. A Cetesb e o Ministério da Saúde Índia são menos presentes nos textos recentes, refletindo possivelmente a evolução das prioridades na saúde pública.

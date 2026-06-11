@@ -1,0 +1,23 @@
+### Narrativas em Alta:
+- **Operações Policiais:** Os textos recentes não apresentam operações policiais, enquanto os textos antigos descrevem operações policiais contra indivíduos suspeitos de atividades ilícitas, como o advogado Antônio Victor Reis Macêdo e o esquema de corrupção na SEMEC de Teresina.
+- **Irregularidades em Empresas:** Os textos recentes não abordam irregularidades em empresas, enquanto os textos antigos descrevem irregularidades em uma empresa, como o esquema de corrupção na SEMEC de Teresina.
+
+### Atores em Alta:
+- **Advogados e Empresários:** Os textos antigos não apresentam advogados ou empresários como protagonistas, enquanto os textos recentes descrevem o advogado Antônio Victor Reis Macêdo e o esquema de corrupção na SEMEC de Teresina.
+- **Empregados e Servidores Públicos:** Os textos recentes não apresentam empregados ou servidores públicos como protagonistas, enquanto os textos antigos descrevem a exoneração de quatro servidores em 2025.
+
+### Narrativas em Baixa:
+- **Animais e Incidentes Não Criminais:** Os textos antigos descrevem incidentes envolvendo animais e mortes suspeitas, como os filhotes de gatos encontrados mortos em uma escola e a morte de Francisco Dias na barragem de Salinas. Os textos recentes não abordam esses tipos de incidentes.
+- **Consumidores e Compras:** Os textos recentes não abordam incidentes envolvendo consumidores e compras, enquanto os textos antigos descrevem a compra de cervejas e o incidente no supermercado Atacadão de Boa Vista.
+
+### Atores em Baixa:
+- **Polícia e Corrupção:** Os textos recentes não abordam casos de corrupção envolvendo a Polícia, enquanto os textos antigos descrevem a operação policial contra o advogado Antônio Victor Reis Macêdo e o esquema de corrupção na SEMEC de Teresina.
+- **Esportes e Desportistas:** Os textos recentes não abordam casos envolvendo esportes ou desportistas, enquanto os textos antigos não mencionam nenhum esporte ou desportista.
+
+### Resumo:
+- **Narrativas em Alta:** Operações policiais, irregularidades em empresas.
+- **Atores em Alta:** Advogados, empresários, empregados e servidores públicos.
+- **Narrativas em Baixa:** Animais, incidentes não criminais, consumidores e compras.
+- **Atores em Baixa:** Polícia e corrupção, esportes e desportistas.
+
+Essas diferenças refletem mudanças na ênfase dos temas abordados nos textos, com os textos recentes se concentrando mais em aspectos econômicos e corporativos, enquanto os textos antigos abordam mais casos de corrupção e operações policiais.

@@ -319,7 +319,7 @@ hr { border-color:var(--border)!important; }
 # Sidebar
 # ─────────────────────────────────────────────
 with st.sidebar:
-    st.image("D:/github/All-in-crawler/logoofcapudados.png", width=160)
+    st.image("D:\github\All-in-crawler/logoofcapudados.png", width=160)
     st.markdown('<hr style="border-color:var(--border);margin:.75rem 0 1rem">', unsafe_allow_html=True)
     st.markdown('<p class="nt-section-label">Navegação</p>', unsafe_allow_html=True)
     page = st.radio(

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apuração · Agita Comunicação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="app/styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#15101F"/><circle cx="44" cy="44" r="20" fill="none" stroke="#FF6A24" stroke-width="6"/><line x1="58" y1="58" x2="74" y2="74" stroke="#7C5BE8" stroke-width="7" stroke-linecap="round"/></svg>
+</template>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="app/data.js"></script>
+<script type="text/babel" data-presets="react">
+
+/* ===== app/icons.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Icons (simple monoline SVG)
+   ============================================================ */
+const S = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
+
+function Icon({ name, size = 20, style }) {
+  const p = { viewBox: "0 0 24 24", width: size, height: size, style, ...S };
+  switch (name) {
+    case "search": return <svg {...p}><circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" /></svg>;
+    case "play": return <svg {...p} fill="currentColor" stroke="none"><path d="M7 5l12 7-12 7V5z" /></svg>;
+    case "stop": return <svg {...p} fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>;
+    case "sun": return <svg {...p}><circle cx="12" cy="12" r="4.2" /><path d="M12 2v2.5M12 19.5V22M4.5 4.5l1.8 1.8M17.7 17.7l1.8 1.8M2 12h2.5M19.5 12H22M4.5 19.5l1.8-1.8M17.7 6.3l1.8-1.8" /></svg>;
+    case "moon": return <svg {...p}><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></svg>;
+    case "trend": return <svg {...p}><path d="M3 17l5-5 4 3 8-9" /><path d="M16 6h5v5" /></svg>;
+    case "narrative": return <svg {...p}><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z" /><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none" /></svg>;
+    case "emotion": return <svg {...p}><path d="M12 21s-7-4.6-9.2-9.1C1.2 8.6 3.2 5 6.7 5c2 0 3.5 1.2 4.3 2.6.8-1.4 2.3-2.6 4.3-2.6 3.5 0 5.5 3.6 3.9 6.9C19 16.4 12 21 12 21z" /></svg>;
+    case "bias": return <svg {...p}><path d="M12 3v18M5 7h14" /><path d="M5 7l-2.5 5a2.5 2.5 0 0 0 5 0L5 7zM19 7l-2.5 5a2.5 2.5 0 0 0 5 0L19 7z" /></svg>;
+    case "actors": return <svg {...p}><circle cx="9" cy="8" r="3.2" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0" /><path d="M16 5.2A3.2 3.2 0 0 1 16 11M17.5 14.5a5.5 5.5 0 0 1 3 5" /></svg>;
+    case "info": return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><circle cx="12" cy="7.6" r="1" fill="currentColor" stroke="none" /></svg>;
+    case "about": return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><circle cx="12" cy="7.6" r="1" fill="currentColor" stroke="none" /></svg>;
+    case "pipeline": return <svg {...p}><rect x="3" y="4" width="7" height="6" rx="1.5" /><rect x="14" y="14" width="7" height="6" rx="1.5" /><path d="M10 7h5a2 2 0 0 1 2 2v5" /></svg>;
+    case "results": return <svg {...p}><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 9v12M3 15h6" /></svg>;
+    case "charts": return <svg {...p}><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" rx="1" fill="currentColor" stroke="none" /><rect x="12.5" y="7" width="3" height="10" rx="1" fill="currentColor" stroke="none" /><rect x="18" y="13" width="3" height="4" rx="1" fill="currentColor" stroke="none" /></svg>;
+    case "pie": return <svg {...p}><path d="M12 3a9 9 0 1 0 9 9h-9V3z" /><path d="M12 3v9h9A9 9 0 0 0 12 3z" /></svg>;
+    case "bars": return <svg {...p}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>;
+    case "source": return <svg {...p}><path d="M4 19.5V6a2 2 0 0 1 2-2h9l5 5v10.5a.5.5 0 0 1-.5.5H6a2 2 0 0 1-2-2z" /><path d="M14 4v5h5" /><path d="M8 13h8M8 16.5h5" /></svg>;
+    case "keyword": return <svg {...p}><path d="M20.5 13.5L13 21a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 2.6 12.6V5a2 2 0 0 1 2-2h7.6a2 2 0 0 1 1.4.6l6.9 6.9a2 2 0 0 1 0 2.8z" /><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none" /></svg>;
+    case "check": return <svg {...p}><path d="M4 12.5l5 5 11-11" /></svg>;
+    case "spinner": return <svg {...p}><path d="M12 3a9 9 0 1 0 9 9" /></svg>;
+    case "rocket": return <svg {...p}><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2c.8-.8.9-2.2.1-3-.8-.8-2.3-.7-3.1 0z" /><path d="M9 12c5-9 12-9 12-9s0 7-9 12l-3-3z" /><circle cx="15" cy="9" r="1.5" /></svg>;
+    case "dots": return <svg {...p} fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>;
+    case "arrow": return <svg {...p}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
+    case "plus": return <svg {...p}><path d="M12 5v14M5 12h14" /></svg>;
+    case "minus": return <svg {...p}><path d="M5 12h14" /></svg>;
+    case "x": return <svg {...p}><path d="M6 6l12 12M18 6L6 18" /></svg>;
+    case "settings": return <svg {...p}><circle cx="12" cy="12" r="3.2" /><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" /></svg>;
+    case "filter": return <svg {...p}><path d="M3 5h18l-7 8v6l-4-2v-4L3 5z" /></svg>;
+    default: return <svg {...p}><circle cx="12" cy="12" r="9" /></svg>;
+  }
+}
+
+const DIM_ICONS = { trend: "trend", narrative: "narrative", emotion: "emotion", bias: "bias", actors: "actors" };
+
+Object.assign(window, { Icon, DIM_ICONS });
+
+
+/* ===== app/components.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Shared components
+   ============================================================ */
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ---- Starburst seal (geometric many-point star) ---- */
+function Starburst({ size = 90, points = 14, color = "var(--orange)", className, style, inner = 0.74 }) {
+  const c = size / 2, rO = size / 2, rI = (size / 2) * inner;
+  let d = "";
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? rO : rI;
+    const a = (Math.PI / points) * i - Math.PI / 2;
+    d += `${i === 0 ? "M" : "L"}${(c + r * Math.cos(a)).toFixed(2)},${(c + r * Math.sin(a)).toFixed(2)}`;
+  }
+  d += "Z";
+  return (
+    <svg className={className} style={style} width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <path d={d} fill={color} />
+    </svg>
+  );
+}
+
+/* ---- marquee tape ---- */
+function Tape({ text = "COMUNICAÇÃO DIGITAL", purple = false, className, style }) {
+  const reps = Array.from({ length: 10 }, (_, i) => <span key={i}>{text} ·</span>);
+  return (
+    <div className={`tape ${purple ? "purple" : ""} ${className || ""}`} style={style}>
+      <div className="tape-track">{reps}{reps}</div>
+    </div>
+  );
+}
+
+/* ---- logo ---- */
+function Logo() {
+  return (
+    <div className="logo-mark brand-logo">
+      <img src="/logoofcapudados.png" alt="APURAÇÃO · Agita Comunicação" />
+    </div>
+  );
+}
+
+/* ---- sidebar ---- */
+const NAV = [
+  { id: "sobre", label: "Sobre", icon: "about", num: "01" },
+  { id: "pipeline", label: "Executar Pipeline", icon: "pipeline", num: "02" },
+  { id: "resultados", label: "Resultados", icon: "results", num: "03" },
+  { id: "visualizacoes", label: "Visualizações", icon: "charts", num: "04" },
+];
+
+function Sidebar({ page, setPage, theme, setTheme }) {
+  return (
+    <aside className="sidebar">
+      <div className="brand">
+        <Logo />
+        <div className="brand-rule" />
+      </div>
+
+      <div className="nav-label">Navegação</div>
+      <nav className="nav">
+        {NAV.map((n) => (
+          <button
+            key={n.id}
+            className={`nav-item ${page === n.id ? "active" : ""}`}
+            onClick={() => setPage(n.id)}
+          >
+            <span className="dot" />
+            <Icon name={n.icon} size={18} className="nav-ico" />
+            <span>{n.label}</span>
+            <span className="nav-num">{n.num}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="side-foot">
+        <div className="side-blurb">
+          Plataforma de inteligência de narrativas da <b>Agita Comunicação</b>. Análise semântica e identificação de tendências em tempo real.
+        </div>
+        <div className="theme-toggle" role="tablist" aria-label="Tema">
+          <button className={theme === "light" ? "on" : ""} onClick={() => setTheme("light")} aria-pressed={theme === "light"}>
+            <Icon name="sun" size={15} /> Claro
+          </button>
+          <button className={theme === "dark" ? "on" : ""} onClick={() => setTheme("dark")} aria-pressed={theme === "dark"}>
+            <Icon name="moon" size={15} /> Escuro
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+/* ---- topbar ---- */
+function Topbar({ page, running }) {
+  const cur = NAV.find((n) => n.id === page);
+  return (
+    <header className="topbar">
+      <div className="crumb">
+        Apuração <span className="sep">/</span> <b>{cur ? cur.label : ""}</b>
+      </div>
+      <div className="topbar-actions">
+        {running ? (
+          <span className="crumb" style={{ color: "var(--o)", fontWeight: 700 }}>
+            <Icon name="spinner" size={15} className="spin" /> Executando…
+          </span>
+        ) : null}
+        <button className="btn-deploy"><Icon name="rocket" size={15} /> Deploy</button>
+        <button className="icon-btn" aria-label="Mais"><Icon name="dots" size={18} /></button>
+      </div>
+    </header>
+  );
+}
+
+/* ---- page header block ---- */
+function PageHead({ eyebrow, title, sub }) {
+  return (
+    <div className="page-head">
+      {eyebrow ? <div className="eyebrow" style={{ marginBottom: 16 }}>{eyebrow}</div> : null}
+      <h1 className="page-title">{title}</h1>
+      {sub ? <p className="page-sub">{sub}</p> : null}
+      <div className="head-rule" />
+    </div>
+  );
+}
+
+function SectionTitle({ title, sub }) {
+  return (
+    <>
+      <h2 className="section-title"><span className="bar" />{title}</h2>
+      {sub ? <p className="section-sub">{sub}</p> : null}
+    </>
+  );
+}
+
+function EmptyState({ eyebrow, title, sub }) {
+  return (
+    <div className="page">
+      <PageHead eyebrow={eyebrow} title={title} sub={sub} />
+      <div className="card" style={{ padding: "52px 32px", textAlign: "center" }}>
+        <div style={{ fontSize: 42, marginBottom: 14, opacity: .85 }}>📭</div>
+        <h3 style={{ margin: "0 0 8px", color: "var(--text)", fontFamily: "var(--font-display)" }}>Nenhum resultado encontrado</h3>
+        <p style={{ color: "var(--text-muted)", margin: 0 }}>Execute o pipeline primeiro para gerar os clusters e as visualizações.</p>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Starburst, Tape, Logo, Sidebar, Topbar, PageHead, SectionTitle, EmptyState, NAV, useState, useEffect, useRef, useMemo });
+
+
+/* ===== app/sobre.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Página Sobre
+   ============================================================ */
+function PageSobre({ setPage }) {
+  const D = window.APP_DATA;
+  return (
+    <div className="page">
+      {/* HERO */}
+      <div className="hero">
+        <div className="hero-grain" />
+        <Tape text="COMUNICAÇÃO DIGITAL" style={{ position: "absolute", top: 26, left: -20, right: -20, zIndex: 1 }} />
+        <Starburst size={110} points={16} color="var(--orange)" style={{ position: "absolute", right: 46, bottom: -22, opacity: .9, zIndex: 1 }} />
+        <Starburst size={62} points={12} color="rgba(255,255,255,.16)" style={{ position: "absolute", right: 150, top: 96, zIndex: 1 }} />
+        <div className="hero-inner">
+          <div className="eyebrow">Agita Comunicação · Plataforma</div>
+          <h1>Inteligência de narrativas para o <span className="mark">debate público</span></h1>
+          <p>O Apuração transforma grandes volumes de dados digitais em insights estratégicos e acionáveis — identificando tendências emergentes antes mesmo de chegarem à grande mídia.</p>
+          <div className="hero-cta">
+            <button className="btn btn-primary" onClick={() => setPage("pipeline")}><Icon name="play" size={15} /> Executar Pipeline</button>
+            <button className="btn btn-ghost" style={{ background: "rgba(255,255,255,.12)", color: "#fff", borderColor: "rgba(255,255,255,.22)" }} onClick={() => setPage("resultados")}>Ver Resultados <Icon name="arrow" size={15} /></button>
+          </div>
+          <div className="hero-stat-row">
+            <div className="hero-stat"><b>{D.stats.total.toLocaleString("pt-BR")}</b><span>DOCUMENTOS ANALISADOS</span></div>
+            <div className="hero-stat"><b>{D.stats.clusters}</b><span>CLUSTERS ATIVOS</span></div>
+            <div className="hero-stat"><b>{D.stats.fontes}</b><span>FONTES MONITORADAS</span></div>
+            <div className="hero-stat"><b>{D.dimensoes.length}</b><span>DIMENSÕES DE ANÁLISE</span></div>
+          </div>
+        </div>
+      </div>
+
+      {/* DIMENSÕES */}
+      <div className="section">
+        <SectionTitle title="Dimensões de Análise" sub="O que a plataforma monitora e classifica em tempo real" />
+        <div className="dim-grid">
+          {D.dimensoes.map((d, i) => (
+            <div className="dim-card" key={d.key}>
+              <span className="corner-no">0{i + 1}</span>
+              <div className="dim-ico" style={{ background: `linear-gradient(135deg,${d.grad[0]},${d.grad[1]})`, boxShadow: `0 8px 20px -8px ${d.grad[0]}` }}>
+                <Icon name={DIM_ICONS[d.key]} size={23} />
+              </div>
+              <h3>{d.title}</h3>
+              <p>{d.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* COMO FUNCIONA */}
+      <div className="section">
+        <SectionTitle title="Como Funciona" sub="Pipeline de 4 etapas — da coleta ao insight" />
+        <div className="steps-grid">
+          {D.etapas.map((e) => (
+            <div className="step-card" key={e.n}>
+              <span className="step-big">{e.n}</span>
+              <span className="etapa">Etapa {e.n}</span>
+              <h3>{e.title}</h3>
+              <p>{e.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA strip */}
+      <div className="section">
+        <div className="card" style={{ overflow: "hidden", position: "relative", background: "linear-gradient(120deg,var(--surface),var(--surface-2))" }}>
+          <Tape text="3 ANOS DE AGITA" purple style={{ position: "absolute", bottom: 0, left: -20, right: -20 }} />
+          <div style={{ padding: "34px 38px 56px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
+            <div>
+              <div className="eyebrow" style={{ marginBottom: 14 }}>Da coleta ao insight</div>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: 34, margin: 0, lineHeight: 1, color: "var(--text)", textTransform: "uppercase" }}>Pronto para apurar?</h2>
+              <p style={{ color: "var(--text-muted)", margin: "12px 0 0", maxWidth: 520 }}>Execute o pipeline completo e gere clusters, narrativas e tendências atualizadas em minutos.</p>
+            </div>
+            <button className="btn btn-primary" onClick={() => setPage("pipeline")}><Icon name="play" size={15} /> Iniciar agora</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { PageSobre });
+
+
+/* ===== app/pipeline.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Página Executar Pipeline
+   ============================================================ */
+function PagePipeline({ running, setRunning }) {
+  const D = window.APP_DATA;
+  const baseSteps = () => (D.pipelineSteps || []).map((s) => ({ ...s, state: "" }));
+  const [progress, setProgress] = useState(0);
+  const [steps, setSteps] = useState(baseSteps);
+  const [log, setLog] = useState([]);
+  const [finished, setFinished] = useState(false);
+  const pollRef = useRef(null);
+  const logRef = useRef(null);
+
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [log]);
+
+  // Retoma a UI se o pipeline já estiver rodando no servidor (ex.: reload)
+  useEffect(() => { poll(true); }, []);
+
+  function poll(initial) {
+    fetch("/api/pipeline/status")
+      .then((r) => r.json())
+      .then((s) => {
+        setLog(s.logs || []);
+        if (s.steps && s.steps.length) setSteps(s.steps);
+        setProgress(s.progress || 0);
+        setRunning(s.running);
+        if (initial && s.running && !pollRef.current) {
+          pollRef.current = setInterval(poll, 700);
+        }
+        if (s.finished) {
+          setFinished(true);
+          setRunning(false);
+          if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+        }
+      })
+      .catch(() => {});
+  }
+
+  function start() {
+    if (pollRef.current) clearInterval(pollRef.current);
+    setFinished(false); setProgress(0); setLog([]); setSteps(baseSteps());
+    setRunning(true);
+    fetch("/api/pipeline/start", { method: "POST" })
+      .then((r) => r.json())
+      .then(() => {
+        poll();
+        pollRef.current = setInterval(poll, 700);
+      })
+      .catch(() => {
+        setRunning(false);
+        setLog([{ type: "warn", text: "✕ Não foi possível contactar o servidor.", t: "" }]);
+      });
+  }
+
+  const stepState = (i) => (steps[i] ? steps[i].state : "");
+
+  return (
+    <div className="page">
+      <PageHead
+        eyebrow={`Pipeline · ${(D.pipelineSteps || []).length} etapas`}
+        title="Executar Pipeline"
+        sub="Inicie o pipeline completo de análise para gerar clusters e tendências atualizadas a partir das fontes monitoradas."
+      />
+
+      <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+        {!running ? (
+          <button className="btn btn-primary" onClick={start} style={{ minWidth: 220 }}>
+            <Icon name="play" size={16} /> {finished ? "Executar novamente" : "Iniciar Pipeline"}
+          </button>
+        ) : (
+          <button className="btn btn-primary" disabled style={{ minWidth: 220, background: "var(--purple)", opacity: .85, cursor: "default" }}>
+            <Icon name="spinner" size={16} className="spin" /> Executando…
+          </button>
+        )}
+        <div style={{ flex: 1, minWidth: 240 }}>
+          <div className="progress-shell">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--o)", fontWeight: 700, minWidth: 48, textAlign: "right" }}>{progress}%</span>
+      </div>
+
+      <div className="pipe-grid">
+        {/* ETAPAS */}
+        <div className="card pipe-panel">
+          <p className="panel-label">Etapas</p>
+          {steps.map((s, i) => {
+            const st = stepState(i);
+            return (
+              <div className={`pipe-step ${st}`} key={s.id}>
+                <span className="st-ico">
+                  {st === "done" ? <Icon name="check" size={17} />
+                    : st === "active" ? <Icon name="spinner" size={17} className="spin" />
+                    : <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700 }}>{s.id}</span>}
+                </span>
+                <div className="st-body">
+                  <b>Step {s.id} — {s.label}</b>
+                  <span>{s.sub}</span>
+                </div>
+                <span className="st-state">
+                  {st === "done" ? "ok" : st === "active" ? "running…" : "—"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* LOG */}
+        <div className="card pipe-panel">
+          <p className="panel-label">Log de Execução</p>
+          <div className="log" ref={logRef}>
+            {log.length === 0 ? (
+              <div className="empty-hint">Aguardando início do pipeline…</div>
+            ) : log.map((l, i) => (
+              <div className="ln" key={i}>
+                <span className="ts">{l.t}</span>
+                <span className={l.type === "ok" ? "ok" : l.type === "warn" ? "warn" : l.type === "info" ? "info" : ""}>
+                  {l.text}
+                </span>
+              </div>
+            ))}
+            {running ? <div className="ln"><span className="ts" /><span className="log-cursor" /></div> : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { PagePipeline });
+
+
+/* ===== app/resultados.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Página Resultados
+   ============================================================ */
+function PageResultados() {
+  const D = window.APP_DATA;
+  const allCols = D.COLUMNS;
+  const [query, setQuery] = useState("");
+  const [perPage, setPerPage] = useState(8);
+  const [page, setPage] = useState(1);
+  const [visible, setVisible] = useState(allCols.map((c) => c.key));
+
+  const maxSize = useMemo(() => Math.max(...D.clusters.map((c) => c.size)), [D]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return D.clusters;
+    return D.clusters.filter((c) =>
+      [c.title, c.description, c.focus, c.distinguishing, c.keywords.join(" "), String(c.id)]
+        .join(" ").toLowerCase().includes(q)
+    );
+  }, [query, D]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const curPage = Math.min(page, totalPages);
+  const rows = filtered.slice((curPage - 1) * perPage, curPage * perPage);
+
+  useEffect(() => { setPage(1); }, [query, perPage]);
+
+  function toggleCol(k) {
+    setVisible((v) => v.includes(k) ? v.filter((x) => x !== k) : [...v, k]);
+  }
+  const isVis = (k) => visible.includes(k);
+
+  function cell(c, key) {
+    switch (key) {
+      case "id": return <span className="cell-id">{c.id}</span>;
+      case "title": return <span className="cell-title">{c.title}</span>;
+      case "size": return <span className="cell-size"><span className="bar-sz" style={{ width: 4 + (c.size / maxSize) * 46 }} />{c.size}</span>;
+      case "keywords": return <span>{c.keywords.slice(0, 3).map((k) => <span className="kw" key={k}>{k}</span>)}</span>;
+      case "description": return <span style={{ display: "inline-block", maxWidth: 280, color: "var(--text-muted)" }}>{c.description}</span>;
+      case "focus": return <span className="foc-tag"><span className="dot" style={{ background: c.focusColor }} />{c.focus}</span>;
+      case "similar": return <span className="cell-id">#{c.similar}</span>;
+      case "similarity": return <span className="sim-bar"><span className="sim-track"><i style={{ width: `${c.similarity * 100}%` }} /></span>{c.similarity.toFixed(2)}</span>;
+      case "distinguishing": return <span style={{ color: "var(--text-muted)" }}>{c.distinguishing}</span>;
+      case "trend": return <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: c.trend.startsWith("▲") ? "#3FBF7F" : c.trend.startsWith("▼") ? "#FF6A24" : "var(--text-muted)" }}>{c.trend}</span>;
+      default: return c[key];
+    }
+  }
+
+  const statCards = [
+    { lab: "Total de Registros", val: D.stats.total, sub: "documentos analisados", c: "var(--orange)" },
+    { lab: "Clusters Únicos", val: D.stats.clusters, sub: "narrativas identificadas", c: "var(--purple)" },
+    { lab: "Fontes", val: D.stats.fontes, sub: "canais monitorados", c: "#FF4D6D" },
+    { lab: "Colunas", val: D.stats.colunas, sub: "atributos por cluster", c: "#2DB1A8" },
+  ];
+
+  if (D.hasData === false) return <EmptyState eyebrow="Clusters · Dataset" title="Resultados dos Clusters" sub="Navegue, pesquise e inspecione os dados de clusters gerados pelo pipeline." />;
+
+  return (
+    <div className="page">
+      <PageHead
+        eyebrow="Clusters · Dataset"
+        title="Resultados dos Clusters"
+        sub="Navegue, pesquise e inspecione os dados de clusters gerados pelo pipeline."
+      />
+
+      {/* STATS */}
+      <div className="stat-grid">
+        {statCards.map((s) => (
+          <div className="stat-card" key={s.lab} style={{ "--accent": s.c }}>
+            <div className="lab">{s.lab}</div>
+            <div className="val">{s.val}</div>
+            <div className="sub">{s.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* TOOLBAR */}
+      <div className="card toolbar">
+        <p className="panel-label" style={{ display: "flex", alignItems: "center", gap: 9, margin: "0 0 18px" }}>
+          <Icon name="filter" size={14} /> Filtros e Colunas
+        </p>
+        <div className="toolbar-row">
+          <div className="search-wrap">
+            <Icon name="search" size={17} />
+            <input className="input" placeholder="Buscar em todas as colunas…" value={query} onChange={(e) => setQuery(e.target.value)} />
+          </div>
+          <div className="field">
+            <span className="field-lab">Linhas por página</span>
+            <select className="input" value={perPage} onChange={(e) => setPerPage(Number(e.target.value))}>
+              {[5, 8, 12, 24].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+        </div>
+        <div style={{ marginTop: 20 }}>
+          <span className="field-lab">Colunas visíveis</span>
+          <div className="cols-wrap">
+            {allCols.map((col) => (
+              <span className={`col-chip ${isVis(col.key) ? "" : "off"}`} key={col.key}>
+                {col.label}
+                <span className="tg" onClick={() => toggleCol(col.key)} title={isVis(col.key) ? "Ocultar" : "Mostrar"}>
+                  <Icon name={isVis(col.key) ? "x" : "plus"} size={13} />
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div style={{ marginTop: 22 }}>
+        <div className="pager-info" style={{ marginBottom: 12 }}>
+          {filtered.length} resultados · página {curPage} de {totalPages}
+        </div>
+        <div className="table-wrap">
+          <table className="data">
+            <thead>
+              <tr>{allCols.filter((c) => isVis(c.key)).map((c) => <th key={c.key}>{c.label}</th>)}</tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 ? (
+                <tr><td colSpan={visible.length}><div className="empty-hint">Nenhum cluster corresponde à busca.</div></td></tr>
+              ) : rows.map((c) => (
+                <tr key={c.id}>
+                  {allCols.filter((col) => isVis(col.key)).map((col) => <td key={col.key}>{cell(c, col.key)}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* PAGER */}
+        <div className="pager">
+          <span className="pager-info">Exibindo {rows.length} de {filtered.length}</span>
+          <div className="pager-ctrl">
+            <button className="pg-btn" disabled={curPage <= 1} onClick={() => setPage(curPage - 1)}><Icon name="minus" size={16} /></button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 6).map((n) => (
+              <button key={n} className={`pg-num ${n === curPage ? "on" : ""}`} onClick={() => setPage(n)}>{n}</button>
+            ))}
+            <button className="pg-btn" disabled={curPage >= totalPages} onClick={() => setPage(curPage + 1)}><Icon name="plus" size={16} /></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { PageResultados });
+
+
+/* ===== app/visualizacoes.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Página Visualizações (+ charts SVG)
+   ============================================================ */
+
+/* ---------- Donut chart ---------- */
+function Donut({ data, height = 300 }) {
+  const total = data.reduce((a, d) => a + d.value, 0);
+  const R = Math.min(height, 360) / 2 - 16;
+  const cx = R + 16, cy = R + 16, size = (R + 16) * 2;
+  const inner = R * 0.58;
+  let acc = -Math.PI / 2;
+  const [hover, setHover] = useState(-1);
+  const arcs = data.map((d, i) => {
+    const frac = d.value / total;
+    const a0 = acc, a1 = acc + frac * Math.PI * 2;
+    acc = a1;
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0);
+    const x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+    const xi1 = cx + inner * Math.cos(a1), yi1 = cy + inner * Math.sin(a1);
+    const xi0 = cx + inner * Math.cos(a0), yi0 = cy + inner * Math.sin(a0);
+    const d2 = `M${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1} L${xi1},${yi1} A${inner},${inner} 0 ${large} 0 ${xi0},${yi0} Z`;
+    return { d2, color: d.color, pct: frac * 100, i };
+  });
+  return (
+    <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flex: "none" }}>
+        {arcs.map((a) => (
+          <path key={a.i} d={a.d2} fill={a.color}
+            opacity={hover === -1 || hover === a.i ? 1 : 0.32}
+            style={{ transition: ".18s", cursor: "pointer", transformOrigin: `${cx}px ${cy}px`, transform: hover === a.i ? "scale(1.04)" : "none" }}
+            onMouseEnter={() => setHover(a.i)} onMouseLeave={() => setHover(-1)} />
+        ))}
+        <text x={cx} y={cy - 6} textAnchor="middle" style={{ fontFamily: "var(--font-display)", fontSize: 30, fill: "var(--text)" }}>{total}</text>
+        <text x={cx} y={cy + 16} textAnchor="middle" style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: 1, fill: "var(--text-muted)" }}>TOTAL</text>
+      </svg>
+      <div className="legend" style={{ flex: 1, minWidth: 180 }}>
+        {data.map((d, i) => (
+          <div className="legend-row" key={d.name}
+            style={{ opacity: hover === -1 || hover === i ? 1 : .4, transition: ".15s", cursor: "default" }}
+            onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(-1)}>
+            <span className="sw" style={{ background: d.color }} />
+            {d.name}
+            <b>{((d.value / total) * 100).toFixed(1)}%</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Horizontal bar list ---------- */
+function BarList({ data }) {
+  const max = Math.max(...data.map((d) => d.value));
+  return (
+    <div className="barlist">
+      {data.map((d) => (
+        <div className="row" key={d.name}>
+          <span className="nm" title={d.name}>{d.name}</span>
+          <div className="tr"><i style={{ width: `${(d.value / max) * 100}%`, background: d.color }} /></div>
+          <span className="vv">{d.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- Line chart ---------- */
+function LineChart({ labels, series, height = 320 }) {
+  const W = 760, H = height, pad = { l: 40, r: 20, t: 20, b: 34 };
+  const allMax = Math.max(...series.flatMap((s) => s.points));
+  const max = Math.ceil(allMax / 10) * 10;
+  const xw = (W - pad.l - pad.r) / (labels.length - 1);
+  const yh = H - pad.t - pad.b;
+  const xy = (v, i) => [pad.l + i * xw, pad.t + yh - (v / max) * yh];
+  const [hi, setHi] = useState(labels.length - 1);
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 520 }}>
+        {[0, .25, .5, .75, 1].map((g, i) => {
+          const y = pad.t + yh - g * yh;
+          return <g key={i}>
+            <line x1={pad.l} y1={y} x2={W - pad.r} y2={y} stroke="var(--border)" strokeWidth="1" />
+            <text x={pad.l - 8} y={y + 4} textAnchor="end" style={{ fontFamily: "var(--font-mono)", fontSize: 10, fill: "var(--text-faint)" }}>{Math.round(g * max)}</text>
+          </g>;
+        })}
+        {labels.map((l, i) => (
+          <text key={l} x={pad.l + i * xw} y={H - 12} textAnchor="middle" style={{ fontFamily: "var(--font-mono)", fontSize: 10, fill: hi === i ? "var(--o)" : "var(--text-faint)" }}>{l}</text>
+        ))}
+        <line x1={pad.l + hi * xw} y1={pad.t} x2={pad.l + hi * xw} y2={pad.t + yh} stroke="var(--border-strong)" strokeDasharray="3 3" />
+        {series.map((s) => {
+          const pts = s.points.map((v, i) => xy(v, i));
+          const dd = pts.map((p, i) => `${i ? "L" : "M"}${p[0]},${p[1]}`).join(" ");
+          const area = `${dd} L${pts[pts.length - 1][0]},${pad.t + yh} L${pad.l},${pad.t + yh} Z`;
+          return <g key={s.name}>
+            <path d={area} fill={s.color} opacity=".07" />
+            <path d={dd} fill="none" stroke={s.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={hi === i ? 5 : 3} fill={s.color} stroke="var(--surface)" strokeWidth="2"
+              onMouseEnter={() => setHi(i)} style={{ cursor: "pointer" }} />)}
+          </g>;
+        })}
+      </svg>
+      <div className="legend" style={{ flexDirection: "row", gap: 22, flexWrap: "wrap", marginTop: 8 }}>
+        {series.map((s) => (
+          <div className="legend-row" key={s.name} style={{ flex: "none" }}>
+            <span className="sw" style={{ background: s.color, borderRadius: 20, width: 16, height: 6 }} />{s.name}
+            <b style={{ marginLeft: 8 }}>{s.points[hi]}</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Page ---------- */
+function PageVisualizacoes() {
+  const D = window.APP_DATA;
+  const [topN, setTopN] = useState(8);
+  const [tab, setTab] = useState("dist");
+  const [focusFilter, setFocusFilter] = useState("all");
+
+  const tabs = [
+    { id: "dist", label: "Distribuição", icon: "pie" },
+    { id: "trend", label: "Tendências", icon: "trend" },
+    { id: "fontes", label: "Fontes", icon: "source" },
+    { id: "kw", label: "Palavras-chave", icon: "keyword" },
+  ];
+
+  const fc = D.focusCounts.slice(0, topN);
+  const fontes = D.fontes.slice(0, topN);
+  const kws = D.keywords.slice(0, topN);
+
+  if (D.hasData === false) return <EmptyState eyebrow="Insights · Gráficos" title="Visualizações" sub="Explore distribuição de clusters, tendências temporais e análise de palavras-chave." />;
+
+  return (
+    <div className="page">
+      <PageHead
+        eyebrow="Insights · Gráficos"
+        title="Visualizações"
+        sub="Explore distribuição de clusters, tendências temporais e análise de palavras-chave."
+      />
+
+      {/* CONTROLES */}
+      <div className="card controls">
+        <p className="panel-label" style={{ display: "flex", alignItems: "center", gap: 9, margin: "0 0 20px" }}>
+          <Icon name="settings" size={14} /> Controles Globais
+        </p>
+        <div className="ctrl-grid">
+          <div className="ctrl">
+            <label>Top N temas / fontes / keywords <span className="q" title="Limita quantos itens aparecem nos gráficos">?</span><span className="v">{topN}</span></label>
+            <input type="range" min="3" max="10" value={topN} onChange={(e) => setTopN(Number(e.target.value))} />
+          </div>
+          <div className="ctrl">
+            <label>Filtrar por tema (Focus) <span className="q" title="Destaca um tema específico">?</span></label>
+            <select className="input" value={focusFilter} onChange={(e) => setFocusFilter(e.target.value)} style={{ width: "100%" }}>
+              <option value="all">Todos os temas — selecione para filtrar</option>
+              {D.focusCounts.map((f) => <option key={f.name} value={f.name}>{f.name}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* TABS */}
+      <div className="tabs">
+        {tabs.map((t) => (
+          <button key={t.id} className={`tab ${tab === t.id ? "on" : ""}`} onClick={() => setTab(t.id)}>
+            <Icon name={t.icon} size={16} /> {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* PANELS */}
+      {tab === "dist" && (
+        <div className="viz-grid">
+          <div className="card viz-card">
+            <div className="vt"><span className="bar" /> Distribuição de Temas</div>
+            <h3>Principais temas (Focus)</h3>
+            <Donut data={fc} />
+          </div>
+          <div className="card viz-card">
+            <div className="vt"><span className="bar" /> Frequência de Temas</div>
+            <h3>Volume por tema</h3>
+            <BarList data={fc} />
+          </div>
+        </div>
+      )}
+
+      {tab === "trend" && (
+        <div className="viz-grid">
+          <div className="card viz-card full">
+            <div className="vt"><span className="bar" /> Tendências Temporais</div>
+            <h3>Evolução dos temas ao longo das semanas</h3>
+            <LineChart labels={D.trend.labels} series={D.trend.series} />
+          </div>
+        </div>
+      )}
+
+      {tab === "fontes" && (
+        <div className="viz-grid">
+          <div className="card viz-card">
+            <div className="vt"><span className="bar" /> Distribuição por Fonte</div>
+            <h3>Origem dos documentos</h3>
+            <Donut data={fontes} />
+          </div>
+          <div className="card viz-card">
+            <div className="vt"><span className="bar" /> Volume por Fonte</div>
+            <h3>Documentos coletados</h3>
+            <BarList data={fontes} />
+          </div>
+        </div>
+      )}
+
+      {tab === "kw" && (
+        <div className="viz-grid">
+          <div className="card viz-card full">
+            <div className="vt"><span className="bar" /> Palavras-chave</div>
+            <h3>Termos mais frequentes nos clusters</h3>
+            <BarList data={kws} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+Object.assign(window, { PageVisualizacoes, Donut, BarList, LineChart });
+
+
+/* ===== app/main.jsx ===== */
+/* ============================================================
+   APURAÇÃO — App root
+   ============================================================ */
+function App() {
+  const [page, setPage] = useState(() => localStorage.getItem("apuracao_page") || "sobre");
+  const [theme, setTheme] = useState(() => localStorage.getItem("apuracao_theme") || "dark");
+  const [running, setRunning] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  // Carrega os dados reais do pipeline e os mescla no APP_DATA
+  useEffect(() => {
+    fetch("/api/data")
+      .then((r) => r.json())
+      .then((d) => { Object.assign(window.APP_DATA, d); })
+      .catch(() => {})        // sem servidor -> usa o fallback de data.js
+      .finally(() => setReady(true));
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("apuracao_theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("apuracao_page", page);
+    const main = document.querySelector(".main-wrap");
+    if (main) main.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
+  }, [page]);
+
+  return (
+    <div className="app">
+      <Sidebar page={page} setPage={setPage} theme={theme} setTheme={setTheme} />
+      <div className="main-wrap">
+        <Topbar page={page} running={running} />
+        {!ready ? (
+          <div className="page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", color: "var(--text-muted)" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 10, fontFamily: "var(--font-mono)" }}>
+              <Icon name="spinner" size={18} className="spin" /> Carregando dados…
+            </span>
+          </div>
+        ) : (
+          <>
+            {page === "sobre" && <PageSobre setPage={setPage} />}
+            {page === "pipeline" && <PagePipeline running={running} setRunning={setRunning} />}
+            {page === "resultados" && <PageResultados />}
+            {page === "visualizacoes" && <PageVisualizacoes />}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+Com base na análise dos textos antigos e recentes fornecidos, podemos identificar algumas diferenças nas narrativas e atores em destaque, bem como nas narrativas e atores em baixa.
+
+### Narrativas em Alta:
+- **Conjunto 1 (Antigo):** A narrativa focava fortemente na política local, com ênfase na disputa pelo cargo de vice-governador e na dinâmica política do Piauí. Havia uma forte presença de nomes políticos locais, como Chico Lucas, Washington, e Noleto.
+- **Conjunto 2 (Recente):** A narrativa recente se desvia para temas mais gerais, como a economia e a cultura, com menção a eventos internacionais e a história do Brasil. A ênfase está mais no cenário econômico global e na cultura africana.
+
+### Atores em Alta:
+- **Conjunto 1 (Antigo):** Os atores políticos locais, como Rafael Fonteles, Chico Lucas, Washington, e Noleto, estavam em destaque.
+- **Conjunto 2 (Recente):** Os atores em destaque são mais globais, como Donald Trump, e locais, como Rebeca Andrade, uma atleta olímpica.
+
+### Narrativas em Baixa:
+- **Conjunto 1 (Antigo):** A narrativa sobre a política local e os candidatos a vice-governador estava em alta.
+- **Conjunto 2 (Recente):** As narrativas sobre a política local diminuíram em destaque, dando lugar a temas mais gerais e internacionais.
+
+### Atores em Baixa:
+- **Conjunto 1 (Antigo):** Não há menção a atores políticos que tenham diminuído em destaque.
+- **Conjunto 2 (Recente):** Os atores políticos locais, como Rafael Fonteles, e os candidatos a vice-governador, como Chico Lucas, Washington, e Noleto, diminuíram em destaque.
+
+### Textos Antigos:
+- **Narrativas:** Focam na política local, com ênfase na disputa pelo cargo de vice-governador.
+- **Atores:** Chico Lucas, Washington, Noleto, Rafael Fonteles.
+
+### Textos Recentes:
+- **Narrativas:** Focam na economia global e na cultura africana.
+- **Atores:** Donald Trump, Rebeca Andrade.
+
+### Resumo:
+- **Narrativas em Alta:** Economia global, cultura africana.
+- **Atores em Alta:** Donald Trump, Rebeca Andrade.
+- **Narrativas em Baixa:** Política local, disputa pelo cargo de vice-governador.
+- **Atores em Baixa:** Chico Lucas, Washington, Noleto, Rafael Fonteles.
+
+Essas diferenças refletem o deslocamento do foco da narrativa e dos atores em destaque, de uma discussão política local para temas mais amplos e globais.

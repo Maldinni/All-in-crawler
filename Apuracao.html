@@ -308,7 +308,7 @@ Object.assign(window, { PageSobre });
 /* ============================================================
    APURAÇÃO — Página Executar Pipeline
    ============================================================ */
-function PagePipeline({ running, setRunning }) {
+function PagePipeline({ running, setRunning, refreshData }) {
   const D = window.APP_DATA;
   const baseSteps = () => (D.pipelineSteps || []).map((s) => ({ ...s, state: "" }));
   const [progress, setProgress] = useState(0);
@@ -318,6 +318,8 @@ function PagePipeline({ running, setRunning }) {
   const [lastCompleted, setLastCompleted] = useState(0);
   const pollRef = useRef(null);
   const logRef = useRef(null);
+  const sawRunningRef = useRef(false);   // viu o pipeline rodando nesta sessão
+  const refreshedRef = useRef(false);    // já atualizou os dados nesta conclusão
 
   const totalSteps = (D.pipelineSteps || []).length;
 
@@ -336,6 +338,7 @@ function PagePipeline({ running, setRunning }) {
         setProgress(s.progress || 0);
         if (typeof s.lastCompleted === "number") setLastCompleted(s.lastCompleted);
         setRunning(s.running);
+        if (s.running) sawRunningRef.current = true;
         if (initial && s.running && !pollRef.current) {
           pollRef.current = setInterval(poll, 700);
         }
@@ -343,6 +346,14 @@ function PagePipeline({ running, setRunning }) {
           setFinished(true);
           setRunning(false);
           if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+          // ao concluir com sucesso, recarrega silenciosamente os dados para
+          // Resultados/Visualizações aparecerem sem refresh manual.
+          // Só dispara se vimos o pipeline rodar nesta sessão (evita loop) e
+          // não houve erro.
+          if (!s.error && sawRunningRef.current && !refreshedRef.current && refreshData) {
+            refreshedRef.current = true;
+            refreshData();
+          }
         }
       })
       .catch(() => {});
@@ -355,6 +366,7 @@ function PagePipeline({ running, setRunning }) {
     )) return;
     if (pollRef.current) clearInterval(pollRef.current);
     setFinished(false); setProgress(0); setLog([]); setSteps(baseSteps());
+    sawRunningRef.current = false; refreshedRef.current = false;
     setRunning(true);
     fetch(`/api/pipeline/start?mode=${mode}`, { method: "POST" })
       .then((r) => r.json())
@@ -928,15 +940,19 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem("apuracao_theme") || "dark");
   const [running, setRunning] = useState(false);
   const [ready, setReady] = useState(false);
+  const [, setDataVersion] = useState(0);
 
-  // Carrega os dados reais do pipeline e os mescla no APP_DATA
-  useEffect(() => {
-    fetch("/api/data")
+  // Carrega/atualiza os dados reais do pipeline e os mescla no APP_DATA.
+  // setDataVersion força o re-render das páginas (Resultados/Visualizações)
+  // sem precisar recarregar a página no navegador.
+  function loadData() {
+    return fetch("/api/data")
       .then((r) => r.json())
-      .then((d) => { Object.assign(window.APP_DATA, d); })
-      .catch(() => {})        // sem servidor -> usa o fallback de data.js
-      .finally(() => setReady(true));
-  }, []);
+      .then((d) => { window.APP_DATA = Object.assign({}, window.APP_DATA, d); setDataVersion((v) => v + 1); })
+      .catch(() => {});       // sem servidor -> usa o fallback de data.js
+  }
+
+  useEffect(() => { loadData().finally(() => setReady(true)); }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -964,7 +980,7 @@ function App() {
         ) : (
           <>
             {page === "sobre" && <PageSobre setPage={setPage} />}
-            {page === "pipeline" && <PagePipeline running={running} setRunning={setRunning} />}
+            {page === "pipeline" && <PagePipeline running={running} setRunning={setRunning} refreshData={loadData} />}
             {page === "resultados" && <PageResultados />}
             {page === "monitoramento" && <PageMonitoramento />}
             {page === "visualizacoes" && <PageVisualizacoes />}

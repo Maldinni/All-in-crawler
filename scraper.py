@@ -68,19 +68,40 @@ def main():
                     all_urls.extend(urls)
 
                 # 3) Padrão: paginação configurada no TOML (build_listing_pages)
+                #    com parada antecipada (evita varrer até 1000 páginas à toa)
                 else:
                     listing_pages = build_listing_pages(source)
+                    max_articles = int(scraping["max_articles_per_source"])
+                    prev_page_urls: set[str] = set()
+
                     for listing_url in listing_pages:
-                        urls = discover_article_urls_listing(
-                            listing_url=listing_url,
-                            allow_domains=source.get("allow_domains"),
-                            user_agent=scraping["user_agent"],
-                            timeout_sec=int(scraping["timeout_sec"]),
-                            link_selector=source.get("link_selector", "a[href]"),
-                            allow_url_patterns=source.get("allow_url_patterns"),
-                            deny_url_patterns=source.get("deny_url_patterns"),
-                        )
+                        try:
+                            urls = discover_article_urls_listing(
+                                listing_url=listing_url,
+                                allow_domains=source.get("allow_domains"),
+                                user_agent=scraping["user_agent"],
+                                timeout_sec=int(scraping["timeout_sec"]),
+                                link_selector=source.get("link_selector", "a[href]"),
+                                allow_url_patterns=source.get("allow_url_patterns"),
+                                deny_url_patterns=source.get("deny_url_patterns"),
+                            )
+                        except Exception as e:
+                            print(f"[WARN] Listing falhou ({listing_url}): {e}. Parando paginacao.")
+                            break
+
+                        # fim da paginação: página sem artigos ou idêntica à anterior
+                        if not urls:
+                            break
+                        page_set = set(urls)
+                        if page_set == prev_page_urls:
+                            break
+                        prev_page_urls = page_set
+
                         all_urls.extend(urls)
+
+                        # já há URLs suficientes para o limite da fonte
+                        if len(set(all_urls)) >= max_articles:
+                            break
 
             except Exception as e:
                 print(f"[WARN] Failed to discover URLs for {source['name']}: {e}")

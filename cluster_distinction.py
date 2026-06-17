@@ -40,7 +40,9 @@ def main():
 
     llm = ChatOllama(
         model=cfg["llm"]["model_name"],
-        temperature=cfg["llm"]["temperature"]
+        temperature=cfg["llm"]["temperature"],
+        num_ctx=cfg["llm"]["num_ctx"],
+        keep_alive=cfg["llm"]["keep_alive"]
     )
 
     distinction_chain = DEFINITION_PROMPT | llm

@@ -4,3 +4,27 @@
 [[entities]]
 label = "Vereador Fernando Lima"
 keywords = ["fernando lima"]
+
+[[entities]]
+label = "Prefeitura de Nazária"
+keywords = ["nazária", "prefeitura de nazária"]
+
+[[entities]]
+label = "Prefeitura de Alto Longá"
+keywords = ["alto longá"]
+
+[[entities]]
+label = "Tropi"
+keywords = ["tropi"]
+
+[[entities]]
+label = "Belauto Bigode"
+keywords = ["belauto bigode", "belauto"]
+
+[[entities]]
+label = "Thays Paiva"
+keywords = ["thays paiva"]
+
+[[entities]]
+label = "Ibama Piauí"
+keywords = ["ibama"]

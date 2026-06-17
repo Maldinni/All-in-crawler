@@ -194,6 +194,48 @@ lang = "pt-BR"
 country = "BR"
 
 [[sources]]
+name = "Google News - Prefeitura de Nazária"
+type = "google_news"
+query = '"Prefeitura de Nazária" Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
+name = "Google News - Prefeitura de Alto Longá"
+type = "google_news"
+query = '"Prefeitura de Alto Longá" Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
+name = "Google News - Tropi"
+type = "google_news"
+query = '"Tropi" prefeito de Nazária Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
+name = "Google News - Belauto Bigode"
+type = "google_news"
+query = '"Belauto Bigode" Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
+name = "Google News - Thays Paiva"
+type = "google_news"
+query = '"Thays Paiva" Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
+name = "Google News - Ibama Piauí"
+type = "google_news"
+query = 'Ibama Piauí'
+lang = "pt-BR"
+country = "BR"
+
+[[sources]]
 name = "X - Comunicação Política"
 type = "x_search"
 query = '( "comunicação política" OR "comunicação institucional" OR "assessoria de comunicação" OR "discurso político" ) lang:pt -is:retweet -is:reply'

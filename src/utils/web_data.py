@@ -9,6 +9,7 @@ mas devolve JSON-serializável em vez de figuras matplotlib.
 """
 
 import math
+import re
 import unicodedata
 from pathlib import Path
 
@@ -87,7 +88,11 @@ def build_monitoring(processed_path, entities, max_per_entity=50):
     for e in entities:
         kws = [_norm(k) for k in e.get("keywords", []) if str(k).strip()]
         if kws:
-            mask = haystack.apply(lambda h: any(k in h for k in kws))
+            # match por palavra inteira (evita ex.: "tropi" casar com "tropical")
+            pattern = re.compile(
+                r"\b(" + "|".join(re.escape(k) for k in kws) + r")\b"
+            )
+            mask = haystack.apply(lambda h: bool(pattern.search(h)))
         else:
             mask = pd.Series(False, index=df.index)
 

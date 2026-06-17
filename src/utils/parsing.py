@@ -65,62 +65,90 @@ def load_config(args: argparse.Namespace) -> Dict[str, Any]:
     return cfg
 
 def extract_cluster_id(filename):
-
-    match = re.search(r"(\d+)", filename)
+    # usa só o nome do arquivo (evita pegar dígitos do caminho) e ancora
+    # no prefixo "cluster_" quando presente
+    name = Path(filename).name
+    match = re.search(r"cluster[_-]?(\d+)", name, re.I)
+    if match is None:
+        match = re.search(r"(\d+)", name)
     return int(match.group(1))
 
+
+def _strip_markdown(text):
+    """Remove marcação markdown (negrito, títulos, citações, crases)."""
+    return re.sub(r"[*#`>]+", "", text)
+
+
+def _clean_bullet(line):
+    """Remove marcadores de lista (-, *, •, ·) e numeração (1. / 1))."""
+    line = re.sub(r"^[\-\*•·–—]+\s*", "", line.strip())
+    line = re.sub(r"^\d+[\.\)]\s*", "", line)
+    return line.strip()
+
+
 def load_and_parse_cluster_file(filepath):
+    """Faz o parsing tolerante da saída do LLM (aceita markdown, variações
+    de acento/maiúsculas e dois-pontos opcionais)."""
 
     with open(filepath, "r", encoding="utf-8") as f:
         text = f.read()
 
-    # keywords
-    keywords_section = re.search(
-        r"Palavras-chave:(.*?)Título:",
-        text,
-        re.S
-    )
+    text = _strip_markdown(text)
 
+    # keywords: bloco entre "Palavras-chave" e "Título"
     keywords = []
-    if keywords_section:
-        keywords = re.findall(r"- (.*)", keywords_section.group(1))
-
-    # title
-    title_match = re.search(
-        r"Título:\s*(.*?)\n",
-        text
+    kw_section = re.search(
+        r"Palavras?\s*-?\s*chave\s*:?(.*?)(?=T[íi]tulo\s*:?)",
+        text, re.S | re.I,
     )
+    if kw_section:
+        for line in kw_section.group(1).splitlines():
+            item = _clean_bullet(line)
+            if item:
+                keywords.append(item)
 
-    title = title_match.group(1).strip() if title_match else ""
+    # título: primeira linha não-vazia após "Título"
+    title = ""
+    title_match = re.search(r"T[íi]tulo\s*:?\s*(.+)", text, re.I)
+    if title_match:
+        title = title_match.group(1).splitlines()[0].strip()
 
-    # description
+    # descrição: bloco entre "Descrição" e "Foco"
+    description = ""
     desc_match = re.search(
-        r"Descrição:\s*(.*?)\n\s*Foco:",
-        text,
-        re.S
+        r"Descri[çc][ãa]o\s*:?(.*?)(?=Foco\s*:?)",
+        text, re.S | re.I,
     )
+    if desc_match:
+        description = " ".join(desc_match.group(1).split()).strip()
 
-    description = desc_match.group(1).strip() if desc_match else ""
-
-    focus_match = re.search(
-        r"Foco:\s*(.*)",
-        text
-    )
-
-    focus = focus_match.group(1).strip() if focus_match else ""
+    # foco: primeira linha não-vazia após "Foco"
+    focus = ""
+    focus_match = re.search(r"Foco\s*:?\s*(.+)", text, re.I)
+    if focus_match:
+        focus = focus_match.group(1).splitlines()[0].strip()
 
     return keywords, title, description, focus
 
+
 def parse_distinction_file(filepath):
+    """Extrai as diferenças do arquivo, tolerante a vários tipos de marcador."""
 
     with open(filepath, "r", encoding="utf-8") as f:
         text = f.read()
 
-    matches = re.findall(r"- (.*)", text)
+    text = _strip_markdown(text)
+    # remove o cabeçalho "Diferenças:" se existir
+    text = re.sub(r"Diferen[çc]as\s*:?", "", text, flags=re.I)
 
-    return "; ".join(matches)
+    items = []
+    for line in text.splitlines():
+        item = _clean_bullet(line)
+        if item:
+            items.append(item)
 
-import re
+    return "; ".join(items)
+
 
 def clean_llm_text(text):
 

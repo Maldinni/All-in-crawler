@@ -63,8 +63,12 @@ def main():
     ensure_dirs(paths["raw"], paths["processed"], paths["checkpoints"], paths["output"])
 
     num_news_per_set = cfg['trends']['max_article_number'] // 2
-    recent_cutoff = pd.to_datetime(str(cfg['trends']['recent_cutoff']) + "-01-01")
-    older_cutoff = pd.to_datetime(str(cfg['trends']['older_cutoff']) + "-01-01")
+    # Corte adaptativo: divide cada cluster pela mediana das suas próprias
+    # datas (mais útil em janelas curtas). Caso desligado, usa os anos fixos.
+    adaptive = bool(cfg['trends'].get('adaptive_cutoff', False))
+    if not adaptive:
+        recent_cutoff = pd.to_datetime(str(cfg['trends']['recent_cutoff']) + "-01-01")
+        older_cutoff = pd.to_datetime(str(cfg['trends']['older_cutoff']) + "-01-01")
 
     llm = ChatOllama(
         model=cfg["llm"]["model_name"],
@@ -98,12 +102,26 @@ def main():
 
     for label in tqdm(labels):
 
-        older_df = news_df[
-            (news_df["Cluster ID"] == label) &
-            (news_df["publish_date"] >= older_cutoff) &
-            (news_df["publish_date"] < recent_cutoff)
-        ].sort_values("publish_date", ascending=True)
+        cluster_all = news_df[news_df["Cluster ID"] == label]
+        cluster_dates = cluster_all["publish_date"].dropna()
 
+        if adaptive:
+            # divide o próprio cluster em metade antiga vs recente
+            if len(cluster_dates) < 2:
+                continue
+            split = cluster_dates.median()
+            older_df = cluster_all[cluster_all["publish_date"] < split]
+            recent_df = cluster_all[cluster_all["publish_date"] >= split]
+        else:
+            split = recent_cutoff
+            older_df = cluster_all[
+                (cluster_all["publish_date"] >= older_cutoff) &
+                (cluster_all["publish_date"] < recent_cutoff)
+            ]
+            recent_df = cluster_all[cluster_all["publish_date"] >= recent_cutoff]
+
+        older_df = older_df.sort_values("publish_date", ascending=True)
+        recent_df = recent_df.sort_values("publish_date", ascending=False)
 
         older_news_list = older_df["text"].dropna().values
 
@@ -115,11 +133,6 @@ def main():
         older_news = "\n\n".join(
             [truncate(t) for t in older_news_list[:n_old]]
         )
-
-        recent_df = news_df[
-            (news_df["Cluster ID"] == label) &
-            (news_df["publish_date"] >= recent_cutoff)
-        ].sort_values("publish_date", ascending=False)
 
         recent_news_list = recent_df["text"].dropna().values[:num_news_per_set]
 
@@ -139,7 +152,7 @@ def main():
 
         chain_input = {
             "title": cluster_title,
-            "date": str(recent_cutoff),
+            "date": str(split),
             "old_news": older_news,
             "recent_news": recent_news
         }

@@ -296,6 +296,11 @@ def build_clusters(clusters_df, focus_color):
             "similarity": round(similarity, 2),
             "distinguishing": _truncate(r.get("Distinguishing Features", ""), 160),
             "trend": _truncate(clean_llm_text(str(r.get("Trends", "") or "")), 90),
+            # versões completas (sem truncar) para a visualização avançada
+            "descriptionFull": str(r.get("Description", "") or "").strip(),
+            "distinguishingFull": str(r.get("Distinguishing Features", "") or "").strip(),
+            "trendFull": clean_llm_text(str(r.get("Trends", "") or "")),
+            "dimensions": str(r.get("Dimensions", "") or "").strip(),
         })
     return rows
 

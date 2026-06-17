@@ -46,6 +46,14 @@ def main():
         df = df.dropna(subset=["Cluster ID"])
         df["Cluster ID"] = df["Cluster ID"].astype(int)
 
+    # Remove clusters sem Foco definido (Focus NaN ou vazio/"nan"/"None"…).
+    # Feito antes da limpeza de NaN, pois aqui ainda dá pra distinguir vazio.
+    if "Focus" in df.columns:
+        focus_norm = df["Focus"].astype(str).str.strip().str.lower()
+        empty_tokens = {t.lower() for t in EMPTY_TOKENS}
+        keep = df["Focus"].notna() & ~focus_norm.isin(empty_tokens | {""})
+        df = df[keep]
+
     # Limpa NaN: numérico -> 0; texto -> string vazia (e remove "nan"/"None")
     for col in df.columns:
         if pd.api.types.is_numeric_dtype(df[col]):
@@ -72,7 +80,7 @@ def main():
 
     print(
         f"Limpeza final concluída: {len(df)} clusters "
-        f"({rows_before - len(df)} linha(s) removida(s)), "
+        f"({rows_before - len(df)} linha(s) removida(s), incluindo sem Foco), "
         f"{len(df.columns)} colunas reordenadas."
     )
 

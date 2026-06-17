@@ -104,7 +104,8 @@ def main():
 
     for cluster_file in cluster_files:
 
-        label = int(Path(cluster_file).stem.split("_")[1])
+        # aceita tanto "cluster_5" quanto "cluster_5.0"
+        label = int(float(Path(cluster_file).stem.split("_")[1]))
 
         if label in processed_clusters:
             continue

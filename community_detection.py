@@ -77,6 +77,11 @@ def main():
     df = pd.read_csv(csv_file)
     df['Cluster ID'] = df['text'].map(text_cluster)
 
+    # Remove artigos que não entraram em nenhuma comunidade (texto ausente
+    # do grafo) — sem isso a coluna fica float e gera Cluster IDs "0.0".
+    df = df.dropna(subset=['Cluster ID'])
+    df['Cluster ID'] = df['Cluster ID'].astype(int)
+
     new_csv_file = csv_file.replace('.csv', '_clustered.csv')
     df.to_csv(new_csv_file, index=False)
 

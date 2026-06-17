@@ -314,8 +314,11 @@ function PagePipeline({ running, setRunning }) {
   const [steps, setSteps] = useState(baseSteps);
   const [log, setLog] = useState([]);
   const [finished, setFinished] = useState(false);
+  const [lastCompleted, setLastCompleted] = useState(0);
   const pollRef = useRef(null);
   const logRef = useRef(null);
+
+  const totalSteps = (D.pipelineSteps || []).length;
 
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
   useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [log]);
@@ -330,6 +333,7 @@ function PagePipeline({ running, setRunning }) {
         setLog(s.logs || []);
         if (s.steps && s.steps.length) setSteps(s.steps);
         setProgress(s.progress || 0);
+        if (typeof s.lastCompleted === "number") setLastCompleted(s.lastCompleted);
         setRunning(s.running);
         if (initial && s.running && !pollRef.current) {
           pollRef.current = setInterval(poll, 700);
@@ -343,11 +347,15 @@ function PagePipeline({ running, setRunning }) {
       .catch(() => {});
   }
 
-  function start() {
+  function start(mode = "resume") {
+    if (mode === "restart" && !window.confirm(
+      "Isto vai APAGAR todos os dados coletados (raw, processed, checkpoints, output) " +
+      "e recomeçar o pipeline do zero. Esta ação não pode ser desfeita.\n\nDeseja continuar?"
+    )) return;
     if (pollRef.current) clearInterval(pollRef.current);
     setFinished(false); setProgress(0); setLog([]); setSteps(baseSteps());
     setRunning(true);
-    fetch("/api/pipeline/start", { method: "POST" })
+    fetch(`/api/pipeline/start?mode=${mode}`, { method: "POST" })
       .then((r) => r.json())
       .then(() => {
         poll();
@@ -361,6 +369,14 @@ function PagePipeline({ running, setRunning }) {
 
   const stepState = (i) => (steps[i] ? steps[i].state : "");
 
+  // Pode retomar quando há etapas concluídas, mas nem todas
+  const canResume = lastCompleted > 0 && lastCompleted < totalSteps;
+  const primaryLabel = canResume
+    ? `Continuar (etapa ${lastCompleted + 1})`
+    : (totalSteps > 0 && lastCompleted >= totalSteps)
+      ? "Executar novamente"
+      : "Iniciar Pipeline";
+
   return (
     <div className="page">
       <PageHead
@@ -371,9 +387,18 @@ function PagePipeline({ running, setRunning }) {
 
       <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
         {!running ? (
-          <button className="btn btn-primary" onClick={start} style={{ minWidth: 220 }}>
-            <Icon name="play" size={16} /> {finished ? "Executar novamente" : "Iniciar Pipeline"}
-          </button>
+          <>
+            <button className="btn btn-primary" onClick={() => start("resume")} style={{ minWidth: 220 }}>
+              <Icon name="play" size={16} /> {primaryLabel}
+            </button>
+            <button
+              className="btn btn-ghost"
+              onClick={() => start("restart")}
+              title="Apaga todos os dados coletados e recomeça o pipeline do zero"
+            >
+              <Icon name="stop" size={16} /> Recomeçar do zero
+            </button>
+          </>
         ) : (
           <button className="btn btn-primary" disabled style={{ minWidth: 220, background: "var(--purple)", opacity: .85, cursor: "default" }}>
             <Icon name="spinner" size={16} className="spin" /> Executando…

@@ -13,6 +13,7 @@ Sem dependências externas (usa apenas a stdlib). Rode com:  py server.py
 """
 
 import json
+import shutil
 import sys
 import threading
 import time
@@ -21,6 +22,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
+from urllib.parse import parse_qs
 
 from src.utils.parsing import load_toml
 from src.utils.pipeline_runner import PIPELINE_STEPS
@@ -39,6 +41,11 @@ RESULT_FILE = str(
     PROJECT_ROOT / _dirs["processed"]
     / "clusters_defined_distinguished_trends_assessed.csv"
 )
+
+# Diretórios de dados apagados ao "recomeçar do zero"
+DATA_DIRS = [_dirs["raw"], _dirs["processed"], _dirs["checkpoints"], _dirs["output"]]
+# Arquivo que persiste quantas etapas já concluíram (para retomar a execução)
+PROGRESS_FILE = PROJECT_ROOT / _dirs["checkpoints"] / "pipeline_progress.json"
 
 # Arquivos estáticos permitidos
 STATIC_CONTENT_TYPES = {
@@ -65,15 +72,43 @@ PIPELINE = {
 }
 
 
-def _reset_pipeline_state():
+def _load_progress():
+    """Quantas etapas já concluíram com sucesso (persistido em disco)."""
+    try:
+        with PROGRESS_FILE.open("r", encoding="utf-8") as f:
+            return int(json.load(f).get("last_completed", 0))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return 0
+
+
+def _save_progress(n):
+    try:
+        PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with PROGRESS_FILE.open("w", encoding="utf-8") as f:
+            json.dump({"last_completed": int(n)}, f)
+    except OSError:
+        pass
+
+
+def _wipe_data():
+    """Apaga e recria os diretórios de dados — usado no 'recomeçar do zero'."""
+    for rel in DATA_DIRS:
+        d = PROJECT_ROOT / rel
+        shutil.rmtree(d, ignore_errors=True)
+        d.mkdir(parents=True, exist_ok=True)
+
+
+def _reset_pipeline_state(start_index=0):
+    total = max(len(PIPELINE_STEPS), 1)
     with _lock:
         PIPELINE["running"] = True
         PIPELINE["finished"] = False
         PIPELINE["error"] = None
-        PIPELINE["progress"] = 0
+        PIPELINE["progress"] = round(start_index / total * 100)
         PIPELINE["logs"] = []
         PIPELINE["steps"] = [
-            {**s, "state": ""} for s in build_pipeline_steps()
+            {**s, "state": "done" if i < start_index else ""}
+            for i, s in enumerate(build_pipeline_steps())
         ]
 
 
@@ -92,11 +127,16 @@ def _set_step(idx, state):
             PIPELINE["steps"][idx]["state"] = state
 
 
-def _run_pipeline_thread():
+def _run_pipeline_thread(start_index=0):
     total = max(len(PIPELINE_STEPS), 1)
-    _log("info", "▶ Pipeline iniciado")
+    if start_index > 0:
+        _log("info", f"▶ Retomando o pipeline a partir da etapa {start_index + 1}")
+    else:
+        _log("info", "▶ Pipeline iniciado")
     try:
         for i, (step_name, script_path) in enumerate(PIPELINE_STEPS):
+            if i < start_index:
+                continue  # etapa já concluída em execução anterior
             _set_step(i, "active")
             _log("info", f"■ {step_name}")
             _log("", f"Running: {script_path}")
@@ -118,6 +158,7 @@ def _run_pipeline_thread():
                 raise RuntimeError(f"Falha na etapa: {step_name}")
 
             _set_step(i, "done")
+            _save_progress(i + 1)
             with _lock:
                 PIPELINE["progress"] = round((i + 1) / total * 100)
             _log("ok", f"✓ {step_name} concluída")
@@ -135,12 +176,25 @@ def _run_pipeline_thread():
             PIPELINE["finished"] = True
 
 
-def _start_pipeline():
+def _start_pipeline(mode="resume"):
     with _lock:
         if PIPELINE["running"]:
             return False
-    _reset_pipeline_state()
-    threading.Thread(target=_run_pipeline_thread, daemon=True).start()
+
+    total = len(PIPELINE_STEPS)
+    if mode == "restart":
+        _wipe_data()        # apaga raw/processed/checkpoints/output
+        _save_progress(0)   # recria o arquivo de progresso zerado
+        start_index = 0
+    else:  # resume — continua da etapa que parou
+        start_index = _load_progress()
+        if start_index >= total:
+            start_index = 0  # tudo já concluído -> executa de novo
+
+    _reset_pipeline_state(start_index)
+    threading.Thread(
+        target=_run_pipeline_thread, args=(start_index,), daemon=True
+    ).start()
     return True
 
 
@@ -193,6 +247,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"hasData": False, "error": str(e)}, status=500)
             return
         if path == "/api/pipeline/status":
+            last_completed = _load_progress()
             with _lock:
                 self._send_json({
                     "running": PIPELINE["running"],
@@ -201,6 +256,8 @@ class Handler(BaseHTTPRequestHandler):
                     "progress": PIPELINE["progress"],
                     "logs": list(PIPELINE["logs"]),
                     "steps": list(PIPELINE["steps"]),
+                    "lastCompleted": last_completed,
+                    "totalSteps": len(PIPELINE_STEPS),
                 })
             return
 
@@ -208,9 +265,14 @@ class Handler(BaseHTTPRequestHandler):
         self._send_file(path.lstrip("/"))
 
     def do_POST(self):
-        path = self.path.split("?", 1)[0]
+        parts = self.path.split("?", 1)
+        path = parts[0]
         if path == "/api/pipeline/start":
-            started = _start_pipeline()
+            qs = parse_qs(parts[1]) if len(parts) > 1 else {}
+            mode = qs.get("mode", ["resume"])[0]
+            if mode not in ("resume", "restart"):
+                mode = "resume"
+            started = _start_pipeline(mode)
             self._send_json({"started": started})
             return
         self.send_error(404)

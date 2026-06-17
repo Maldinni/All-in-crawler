@@ -3,3 +3,6 @@ keys.env
 __pycache__/
 *.pyc
 *.egg-info/
+
+# Dados gerados pelo pipeline (nao versionar)
+data/

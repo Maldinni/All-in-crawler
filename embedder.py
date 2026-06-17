@@ -35,6 +35,11 @@ def main():
 
     df = pd.concat(dfs, ignore_index=True)
 
+    # Drop rows without usable text; empty cells load as NaN (float) and
+    # the embedding model only accepts strings.
+    df = df.dropna(subset=['text'])
+    df = df[df['text'].astype(str).str.strip() != '']
+
     # Initialize the embedding model
     embedding_model = SentenceTransformerEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -59,13 +64,14 @@ def main():
         text_embeddings = Embeddings()
 
         selection = df.iloc[start:end]
-        texts = selection['text'].tolist()
-        
+        texts = selection['text'].astype(str).tolist()
+
         # Generate embeddings for texts
         embedded_texts = embedding_model.embed_documents(texts)
 
-        # Store PMIDs and embeddings
-        text_embeddings.texts = selection['text'].tolist()
+        # Store URLs, texts and embeddings
+        text_embeddings.urls = selection['canonical_url'].tolist()
+        text_embeddings.texts = texts
         text_embeddings.embeddings = embedded_texts
 
         # Save the current shard of embeddings to disk

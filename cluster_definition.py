@@ -54,7 +54,7 @@ def main():
     required_fields = cfg['definition']['required_fields']
 
     llm = ChatOllama(
-        model="qwen2.5:7b",
+        model=cfg['llm']['model_name'],
         temperature=cfg['llm']['temperature']
     )
 

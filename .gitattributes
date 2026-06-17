@@ -1,0 +1,4 @@
+# Scripts de shell precisam de LF mesmo commitados no Windows,
+# senão o bash do macOS/Linux quebra com erro de '\r'.
+*.command text eol=lf
+*.sh      text eol=lf

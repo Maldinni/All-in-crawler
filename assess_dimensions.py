@@ -30,7 +30,7 @@ def main():
     DIMENSIONS_PROMPT = PromptTemplate(
         input_variables=["title", "texts"],
         template="""
-            Leia os textos abaixo e descreva as principais dimensões discursivas do cluster.
+            Você é um analista de discurso. Leia os textos do cluster e classifique-o em 9 dimensões.
 
             Título do Cluster:
             {title}
@@ -38,34 +38,31 @@ def main():
             Textos:
             {texts}
 
-            Identifique de forma concisa:
+            Regras:
+            - Para CADA dimensão, escolha EXATAMENTE UMA opção da lista entre chaves.
+            - Use o rótulo exatamente como está escrito na lista, sem reescrever nem combinar opções.
+            - Responda SOMENTE no formato de saída abaixo: uma dimensão por linha, sem explicações nem texto extra.
+            - Se os textos não permitirem decidir, escreva "Indefinido".
 
-            Posicionamento Social e Político: apoio, crítica ou neutralidade em relação a temas sociais ou políticos.
+            Dimensões e opções permitidas:
+            1. Posicionamento Social e Político {{Apoio | Crítica | Neutralidade}}
+            2. Tom Emocional {{Neutro | Crítico | Alarmista | Sensacionalista}}
+            3. Enquadramento do Problema {{Causas | Consequências | Responsabilização de atores}}
+            4. Centralidade de Atores Sociais {{Governo | Polícia | Vítimas | Políticos | População | Outros}}
+            5. Foco em Instituições ou Indivíduos {{Instituições | Indivíduos | Ambos}}
+            6. Alcance Nacional ou Internacional {{Local | Regional | Nacional | Internacional}}
+            7. Evento Pontual ou Problema Estrutural {{Evento pontual | Problema estrutural}}
+            8. Uso de Evidências e Fontes {{Presente | Ausente}}
+            9. Tipo de Veículo de Mídia {{Notícia jornalística | Rede social | Comunicado oficial | Outros}}
 
-            Tom Emocional: sentimento predominante (ex: neutro, crítico, alarmista, sensacionalista).
-
-            Enquadramento do Problema: forma como o problema é apresentado (ex: foco em causas, consequências, responsabilização de atores).
-
-            Centralidade de Atores Sociais: grupos ou atores mais mencionados (ex: governo, polícia, vítimas, políticos, população).
-
-            Foco em Instituições ou Indivíduos: se o destaque está em organizações (ex: governo, polícia) ou em pessoas específicas.
-
-            Alcance Geográfico: nível do tema (ex: local, regional, nacional, internacional).
-
-            Evento Pontual ou Problema Estrutural: se o texto descreve um fato isolado ou um problema recorrente.
-
-            Uso de Evidências e Fontes: presença de dados, estatísticas, especialistas ou declarações oficiais.
-
-            Tipo de Veículo de Mídia: origem do conteúdo (ex: notícia jornalística, rede social, comunicado oficial).
-
-            Saída:
+            Formato de saída (preencha após os dois-pontos com uma única opção da lista):
 
             - Dimensão 1 - Posicionamento Social e Político:
             - Dimensão 2 - Tom Emocional:
             - Dimensão 3 - Enquadramento do Problema:
             - Dimensão 4 - Centralidade de Atores Sociais:
             - Dimensão 5 - Foco em Instituições ou Indivíduos:
-            - Dimensão 6 - Alcance Geográfico:
+            - Dimensão 6 - Alcance Nacional ou Internacional:
             - Dimensão 7 - Evento Pontual ou Problema Estrutural:
             - Dimensão 8 - Uso de Evidências e Fontes:
             - Dimensão 9 - Tipo de Veículo de Mídia:
@@ -77,7 +74,9 @@ def main():
 
     llm = ChatOllama(
         model=cfg["llm"]["model_name"],
-        temperature=cfg["llm"]["temperature"]
+        temperature=cfg["llm"]["temperature"],
+        num_ctx=cfg["llm"]["num_ctx"],
+        keep_alive=cfg["llm"]["keep_alive"]
     )
 
     dimensions_chain = DIMENSIONS_PROMPT | llm

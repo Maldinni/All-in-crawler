@@ -38,6 +38,8 @@ required_fields = [
 
 [llm]
 temperature = 0.1
-model_name = 'qwen2.5:7b'
+model_name = 'qwen2.5:3b-instruct-q5_K_M'   # 3b instruct quantizado em q5 (~2,3 GB); cabe em 8 GB (M2 Air) e recupera qualidade vs. o q4 padrao
+num_ctx = 8192              # evita o truncamento silencioso que ocorria no default 2048 (prompts tem ~3-4.5k tokens); KV cache do 3b ~0.3 GB
+keep_alive = '30m'          # mantem o modelo residente entre clusters p/ nao recarregar; troque por '0' para liberar a RAM assim que terminar
 delay = 0.5
 retries = 5

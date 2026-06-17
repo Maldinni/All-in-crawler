@@ -1,0 +1,33 @@
+# Apuração · Agita — dependências de runtime (servidor + pipeline)
+# Otimizado: NÃO inclui a stack legada de UI (streamlit/plotly/matplotlib/
+# seaborn/wordcloud), usada só pelo antigo app.py. O server.py + SPA renderiza
+# os gráficos no cliente a partir de JSON.
+
+# Núcleo
+pandas
+numpy
+tqdm
+psutil
+
+# Scraping / extração de notícias
+requests
+beautifulsoup4
+lxml
+lxml_html_clean
+newspaper3k
+pdfminer.six
+
+# Embeddings e busca vetorial
+sentence-transformers
+faiss-cpu
+
+# Grafo / detecção de comunidades
+python-igraph
+leidenalg
+h5py
+
+# LLM local (via Ollama)
+langchain-ollama
+
+# Configuração (.env — token do X é opcional)
+python-dotenv

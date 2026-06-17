@@ -185,6 +185,14 @@ mode = "path_format"
 start = 1
 end = 1000
 
+# --- Atores/clientes monitorados (Google News RSS) ---
+[[sources]]
+name = "Google News - Vereador Fernando Lima"
+type = "google_news"
+query = '"vereador fernando lima" Teresina Piauí'
+lang = "pt-BR"
+country = "BR"
+
 [[sources]]
 name = "X - Comunicação Política"
 type = "x_search"

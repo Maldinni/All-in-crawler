@@ -9,6 +9,7 @@ from src.utils.discovery import (
     discover_urls_with_wp_pagination,
 )
 from src.utils.extraction import extract_with_retry
+from src.utils.google_news import discover_google_news_items, build_google_news_record
 from src.utils.io import ensure_dirs, determine_output_filename, append_csv
 
 # --- Scraping do X (Twitter) desativado por enquanto ---
@@ -134,6 +135,49 @@ def main():
 
             save_processed_urls(processed_path, processed)
             continue  # importante: não cair no fluxo de outros types
+
+        if source["type"] == "google_news":
+            try:
+                items = discover_google_news_items(
+                    query=source["query"],
+                    lang=source.get("lang", "pt-BR"),
+                    country=source.get("country", "BR"),
+                    user_agent=scraping["user_agent"],
+                    timeout_sec=int(scraping["timeout_sec"]),
+                    max_items=int(scraping["max_articles_per_source"]),
+                )
+            except Exception as e:
+                print(f"[WARN] Falha no Google News para {source['name']}: {e}")
+                continue
+
+            print(f"Discovered news items: {len(items)}")
+
+            for item in items:
+                key = item["canonical_url"]
+                if not key or key in processed:
+                    continue
+
+                if runtime["dry_run"]:
+                    print("[dry-run]", key)
+                    processed.add(key)
+                    continue
+
+                record = build_google_news_record(source["name"], item)
+                record["source"] = source["name"]
+                buffer.append(record)
+                processed.add(key)
+
+                if len(buffer) >= items_per_shard:
+                    append_csv(output_file, buffer)
+                    save_processed_urls(processed_path, processed)
+                    buffer = []
+                    output_file, shard_id = determine_output_filename(
+                        paths["raw"], ext=sharding.get("format", "jsonl")
+                    )
+                    print(f"Flushed shard -> {output_file}")
+
+            save_processed_urls(processed_path, processed)
+            continue
 
         # --- Scraping do X (Twitter) desativado por enquanto ---
         # if source["type"] == "x_search":

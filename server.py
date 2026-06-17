@@ -42,6 +42,14 @@ RESULT_FILE = str(
     / "clusters_defined_distinguished_trends_assessed.csv"
 )
 
+# Entidades monitoradas (aba "Monitoramento") — opcional
+try:
+    MONITORING_ENTITIES = load_toml(
+        PROJECT_ROOT / "config" / "monitoring.toml"
+    ).get("entities", [])
+except (FileNotFoundError, KeyError):
+    MONITORING_ENTITIES = []
+
 # Diretórios de dados apagados ao "recomeçar do zero"
 DATA_DIRS = [_dirs["raw"], _dirs["processed"], _dirs["checkpoints"], _dirs["output"]]
 # Arquivo que persiste quantas etapas já concluíram (para retomar a execução)
@@ -241,7 +249,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/data":
             try:
-                data = build_app_data(RESULT_FILE, PROCESSED_PATH)
+                data = build_app_data(RESULT_FILE, PROCESSED_PATH, MONITORING_ENTITIES)
                 self._send_json(data)
             except Exception as e:  # noqa: BLE001
                 self._send_json({"hasData": False, "error": str(e)}, status=500)

@@ -1,0 +1,6 @@
+# Atores/clientes monitorados. Cada entidade gera um painel na aba
+# "Monitoramento", listando TODAS as notícias que citam as palavras-chave
+# (independente de cluster, trends ou de estar "em alta").
+[[entities]]
+label = "Vereador Fernando Lima"
+keywords = ["fernando lima"]

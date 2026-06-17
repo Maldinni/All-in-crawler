@@ -9,6 +9,7 @@ mas devolve JSON-serializável em vez de figuras matplotlib.
 """
 
 import math
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
@@ -41,6 +42,77 @@ def _read_csv(path):
 def _truncate(text, n):
     text = str(text).strip()
     return text if len(text) <= n else text[: n - 1].rstrip() + "…"
+
+
+# ─────────────────────────────────────────────────────────────
+# Monitoramento de atores/clientes (filtro por palavra-chave)
+# ─────────────────────────────────────────────────────────────
+def _norm(s):
+    """Minúsculas + remoção de acentos, para busca tolerante."""
+    s = unicodedata.normalize("NFKD", str(s).lower())
+    return "".join(c for c in s if not unicodedata.combining(c))
+
+
+def _col_norm(df, col):
+    if col in df.columns:
+        return df[col].fillna("").map(_norm)
+    return pd.Series([""] * len(df), index=df.index)
+
+
+def build_monitoring(processed_path, entities, max_per_entity=50):
+    """Para cada entidade monitorada, lista os artigos que citam as
+    palavras-chave (no título ou no texto), ordenados por data desc."""
+    if not entities:
+        return []
+
+    base = Path(processed_path)
+    candidates = [
+        base / "articles_merged_cleaned_clustered_organized.csv",
+        base / "articles_merged_cleaned_clustered.csv",
+        base / "articles_merged_cleaned.csv",
+    ]
+    art_path = next((p for p in candidates if p.exists()), None)
+
+    if art_path is None:
+        return [
+            {"label": e.get("label", ""), "keywords": e.get("keywords", []),
+             "count": 0, "articles": []}
+            for e in entities
+        ]
+
+    df = _read_csv(art_path)
+    haystack = _col_norm(df, "title") + " " + _col_norm(df, "text")
+
+    out = []
+    for e in entities:
+        kws = [_norm(k) for k in e.get("keywords", []) if str(k).strip()]
+        if kws:
+            mask = haystack.apply(lambda h: any(k in h for k in kws))
+        else:
+            mask = pd.Series(False, index=df.index)
+
+        sub = df[mask].copy()
+        if "publish_date" in sub.columns:
+            sub["_d"] = pd.to_datetime(sub["publish_date"], errors="coerce", utc=True)
+            sub = sub.sort_values("_d", ascending=False)
+
+        articles = []
+        for _, r in sub.head(max_per_entity).iterrows():
+            articles.append({
+                "title": str(r.get("title", "") or "").strip(),
+                "source": str(r.get("source", "") or "").strip(),
+                "date": str(r.get("publish_date", "") or "")[:10],
+                "url": str(r.get("canonical_url", "") or r.get("url", "") or "").strip(),
+            })
+
+        out.append({
+            "label": e.get("label", ""),
+            "keywords": e.get("keywords", []),
+            "count": int(mask.sum()),
+            "articles": articles,
+        })
+
+    return out
 
 
 # ─────────────────────────────────────────────────────────────
@@ -231,19 +303,21 @@ def build_clusters(clusters_df, focus_color):
 # ─────────────────────────────────────────────────────────────
 # Builder principal
 # ─────────────────────────────────────────────────────────────
-def build_app_data(result_file, processed_path):
+def build_app_data(result_file, processed_path, entities=None):
     """Devolve um dict JSON-serializável com os dados reais do pipeline.
 
     Se os arquivos não existirem, devolve hasData=False com listas vazias —
     a interface mostra os estados vazios ("Execute o pipeline primeiro").
     """
     pipeline_steps = build_pipeline_steps()
+    monitoring = build_monitoring(processed_path, entities or [])
     result_path = Path(result_file)
 
     if not result_path.exists():
         return {
             "hasData": False,
             "pipelineSteps": pipeline_steps,
+            "monitoring": monitoring,
             "stats": {"total": 0, "clusters": 0, "fontes": 0, "colunas": 0},
             "clusters": [],
             "focusCounts": [],
@@ -272,6 +346,7 @@ def build_app_data(result_file, processed_path):
     return {
         "hasData": True,
         "pipelineSteps": pipeline_steps,
+        "monitoring": monitoring,
         "stats": stats,
         "clusters": build_clusters(clusters_df, focus_color),
         "focusCounts": focus_counts,

@@ -117,7 +117,8 @@ const NAV = [
   { id: "sobre", label: "Sobre", icon: "about", num: "01" },
   { id: "pipeline", label: "Executar Pipeline", icon: "pipeline", num: "02" },
   { id: "resultados", label: "Resultados", icon: "results", num: "03" },
-  { id: "visualizacoes", label: "Visualizações", icon: "charts", num: "04" },
+  { id: "monitoramento", label: "Monitoramento", icon: "actors", num: "04" },
+  { id: "visualizacoes", label: "Visualizações", icon: "charts", num: "05" },
 ];
 
 function Sidebar({ page, setPage, theme, setTheme }) {
@@ -613,6 +614,82 @@ function PageResultados() {
 Object.assign(window, { PageResultados });
 
 
+/* ===== app/monitoramento.jsx ===== */
+/* ============================================================
+   APURAÇÃO — Página Monitoramento (atores/clientes)
+   ============================================================ */
+function PageMonitoramento() {
+  const D = window.APP_DATA;
+  const ents = D.monitoring || [];
+  const [active, setActive] = useState(0);
+  const [query, setQuery] = useState("");
+
+  if (!ents.length) {
+    return (
+      <div className="page">
+        <PageHead eyebrow="Acompanhamento · Atores" title="Monitoramento"
+          sub="Acompanhe todas as notícias que citam um ator ou cliente monitorado." />
+        <div className="card" style={{ padding: "44px 32px", textAlign: "center", color: "var(--text-muted)" }}>
+          Nenhuma entidade configurada. Edite <code>config/monitoring.toml</code> para adicionar atores monitorados.
+        </div>
+      </div>
+    );
+  }
+
+  const ent = ents[Math.min(active, ents.length - 1)];
+  const q = query.trim().toLowerCase();
+  const arts = (ent.articles || []).filter((a) =>
+    !q || `${a.title} ${a.source}`.toLowerCase().includes(q)
+  );
+
+  return (
+    <div className="page">
+      <PageHead eyebrow="Acompanhamento · Atores" title="Monitoramento"
+        sub="Todas as notícias que citam o ator monitorado — independente de cluster, tendência ou volume." />
+
+      <div className="tabs">
+        {ents.map((e, i) => (
+          <button key={e.label} className={`tab ${i === active ? "on" : ""}`} onClick={() => setActive(i)}>
+            <Icon name="actors" size={16} /> {e.label}
+            <span className="kw" style={{ marginLeft: 6 }}>{e.count}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="card" style={{ marginTop: 18 }}>
+        <div className="search-wrap" style={{ marginBottom: 16 }}>
+          <Icon name="search" size={17} />
+          <input className="input" placeholder="Filtrar nesta lista…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </div>
+
+        <div className="pager-info" style={{ marginBottom: 12 }}>
+          {arts.length} notícia(s){ent.keywords && ent.keywords.length ? ` · termos: ${ent.keywords.join(", ")}` : ""}
+        </div>
+
+        {arts.length === 0 ? (
+          <div className="empty-hint">Nenhuma notícia encontrada para este ator ainda. Rode o pipeline para coletar.</div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {arts.map((a, i) => (
+              <a key={i} href={a.url || "#"} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 10, textDecoration: "none", background: "var(--surface-2)" }}>
+                <div style={{ color: "var(--text)", fontWeight: 600, marginBottom: 6 }}>{a.title || "(sem título)"}</div>
+                <div style={{ display: "flex", gap: 16, alignItems: "center", fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+                  <span className="foc-tag"><span className="dot" style={{ background: "var(--orange)" }} />{a.source || "—"}</span>
+                  <span>{a.date}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { PageMonitoramento });
+
+
 /* ===== app/visualizacoes.jsx ===== */
 /* ============================================================
    APURAÇÃO — Página Visualizações (+ charts SVG)
@@ -889,6 +966,7 @@ function App() {
             {page === "sobre" && <PageSobre setPage={setPage} />}
             {page === "pipeline" && <PagePipeline running={running} setRunning={setRunning} />}
             {page === "resultados" && <PageResultados />}
+            {page === "monitoramento" && <PageMonitoramento />}
             {page === "visualizacoes" && <PageVisualizacoes />}
           </>
         )}

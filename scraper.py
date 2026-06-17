@@ -11,8 +11,9 @@ from src.utils.discovery import (
 from src.utils.extraction import extract_with_retry
 from src.utils.io import ensure_dirs, determine_output_filename, append_csv
 
-from src.utils.X.x_search import search_recent_tweets
-from src.utils.X.x_extraction import normalize_x_record
+# --- Scraping do X (Twitter) desativado por enquanto ---
+# from src.utils.X.x_search import search_recent_tweets
+# from src.utils.X.x_extraction import normalize_x_record
 
 
 def main():
@@ -134,50 +135,51 @@ def main():
             save_processed_urls(processed_path, processed)
             continue  # importante: não cair no fluxo de outros types
 
-        if source["type"] == "x_search":
-            try:
-                max_items = int(scraping["max_articles_per_source"])
-
-                pairs = search_recent_tweets(
-                    query=source["query"],
-                    max_results=max_items,
-                    pages=int(source.get("pages", 2)),
-                )
-            except Exception as e:
-                print(f"[WARN] Failed X search for {source['name']}: {e}")
-                continue
-
-            print(f"Discovered tweets: {len(pairs)}")
-
-            for tweet, author in pairs:
-                record = normalize_x_record(source["name"], tweet, author)
-
-                # checkpoint: canonical_url ou fallback
-                key = record.get("canonical_url") or f"x://status/{record.get('id','')}"
-                if not key or key in processed:
-                    continue
-
-                if runtime["dry_run"]:
-                    print("[dry-run]", key)
-                    processed.add(key)
-                    continue
-
-                buffer.append(record)
-                processed.add(key)
-
-                if len(buffer) >= items_per_shard:
-                    append_csv(output_file, buffer)
-                    save_processed_urls(processed_path, processed)
-                    buffer = []
-                    output_file, shard_id = determine_output_filename(
-                        paths["raw"], ext=sharding.get("format", "jsonl")
-                    )
-                    print(f"Flushed shard -> {output_file}")
-
-                sleep(float(scraping["sleep_time"]))
-
-            save_processed_urls(processed_path, processed)
-            continue
+        # --- Scraping do X (Twitter) desativado por enquanto ---
+        # if source["type"] == "x_search":
+        #     try:
+        #         max_items = int(scraping["max_articles_per_source"])
+        #
+        #         pairs = search_recent_tweets(
+        #             query=source["query"],
+        #             max_results=max_items,
+        #             pages=int(source.get("pages", 2)),
+        #         )
+        #     except Exception as e:
+        #         print(f"[WARN] Failed X search for {source['name']}: {e}")
+        #         continue
+        #
+        #     print(f"Discovered tweets: {len(pairs)}")
+        #
+        #     for tweet, author in pairs:
+        #         record = normalize_x_record(source["name"], tweet, author)
+        #
+        #         # checkpoint: canonical_url ou fallback
+        #         key = record.get("canonical_url") or f"x://status/{record.get('id','')}"
+        #         if not key or key in processed:
+        #             continue
+        #
+        #         if runtime["dry_run"]:
+        #             print("[dry-run]", key)
+        #             processed.add(key)
+        #             continue
+        #
+        #         buffer.append(record)
+        #         processed.add(key)
+        #
+        #         if len(buffer) >= items_per_shard:
+        #             append_csv(output_file, buffer)
+        #             save_processed_urls(processed_path, processed)
+        #             buffer = []
+        #             output_file, shard_id = determine_output_filename(
+        #                 paths["raw"], ext=sharding.get("format", "jsonl")
+        #             )
+        #             print(f"Flushed shard -> {output_file}")
+        #
+        #         sleep(float(scraping["sleep_time"]))
+        #
+        #     save_processed_urls(processed_path, processed)
+        #     continue
 
         print(f"Source type desconhecido: {source['type']}. Pulando.")
         continue

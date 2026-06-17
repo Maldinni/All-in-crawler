@@ -1,0 +1,39 @@
+Como definir o ícone do app (rodar UMA vez, no Mac)
+====================================================
+
+O ícone fica em: Apuracao.app/Contents/Resources/Apuracao.icns
+(o nome "Apuracao" precisa bater com o CFBundleIconFile do Info.plist)
+
+1) Tenha uma imagem quadrada (de preferência 1024x1024) em PNG, ex.: icone.png
+
+2) Forma rápida (1 comando) — converte PNG direto para .icns:
+
+   cd "caminho/do/projeto"
+   sips -s format icns icone.png --out "Apuracao.app/Contents/Resources/Apuracao.icns"
+
+   (OU, para qualidade multi-resolução, use um iconset:)
+
+   mkdir Apuracao.iconset
+   for s in 16 32 64 128 256 512; do
+     sips -z $s $s     icone.png --out Apuracao.iconset/icon_${s}x${s}.png
+     sips -z $((s*2)) $((s*2)) icone.png --out Apuracao.iconset/icon_${s}x${s}@2x.png
+   done
+   iconutil -c icns Apuracao.iconset -o "Apuracao.app/Contents/Resources/Apuracao.icns"
+   rm -rf Apuracao.iconset
+
+3) Atualize o cache de ícone do Finder:
+
+   touch Apuracao.app
+
+4) Commite o .icns para ele sobreviver aos próximos git pull:
+
+   git add "Apuracao.app/Contents/Resources/Apuracao.icns"
+   git commit -m "icone do app"
+
+Observações
+-----------
+- Sem o .icns o app funciona, só mostra um ícone genérico.
+- Se o macOS bloquear na 1ª abertura ("desenvolvedor não identificado"),
+  clique com o botão direito no app -> Abrir (só na primeira vez).
+- Mantenha o Apuracao.app dentro da pasta do projeto. Para ter no Dock,
+  arraste-o para lá (o Dock guarda a referência ao local dele no projeto).

@@ -2,3 +2,5 @@
 # senão o bash do macOS/Linux quebra com erro de '\r'.
 *.command text eol=lf
 *.sh      text eol=lf
+# Wrapper do bundle .app (sem extensão)
+Apuracao.app/Contents/MacOS/Apuracao text eol=lf

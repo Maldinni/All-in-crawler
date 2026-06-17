@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Wrapper do bundle .app — abre o launcher (run_app.command) no Terminal,
+# mantendo visível a instalação/progresso e os prompts da 1ª execução.
+#
+# O .app fica dentro da pasta do projeto. O launcher está 3 níveis acima
+# deste executável: Apuracao.app/Contents/MacOS/Apuracao -> raiz do projeto.
+#
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+LAUNCHER="$ROOT/run_app.command"
+
+if [ ! -f "$LAUNCHER" ]; then
+  osascript -e 'display alert "Apuração" message "Mantenha o Apuracao.app dentro da pasta do projeto (junto do run_app.command)."' >/dev/null 2>&1
+  exit 1
+fi
+
+chmod +x "$LAUNCHER" 2>/dev/null
+open -a Terminal "$LAUNCHER"

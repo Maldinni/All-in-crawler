@@ -687,6 +687,9 @@ function PageMonitoramento() {
   const ents = D.monitoring || [];
   const [active, setActive] = useState(0);
   const [query, setQuery] = useState("");
+  const [preset, setPreset] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   if (!ents.length) {
     return (
@@ -702,9 +705,33 @@ function PageMonitoramento() {
 
   const ent = ents[Math.min(active, ents.length - 1)];
   const q = query.trim().toLowerCase();
-  const arts = (ent.articles || []).filter((a) =>
-    !q || `${a.title} ${a.source}`.toLowerCase().includes(q)
-  );
+
+  // limites do seletor de datas: menor/maior data entre os artigos desta entidade
+  const allDates = (ent.articles || []).map((a) => a.date).filter(Boolean);
+  const minDate = allDates.length ? allDates.reduce((m, d) => (d < m ? d : m)) : "";
+  const maxDate = allDates.length ? allDates.reduce((m, d) => (d > m ? d : m)) : "";
+
+  // converte o período escolhido em um intervalo "YYYY-MM-DD" (relativo a hoje)
+  const fmtDate = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  function presetRange(p) {
+    if (p === "custom") return { from: dateFrom, to: dateTo };
+    if (p === "all") return { from: "", to: "" };
+    const start = new Date();
+    if (p === "30d") start.setDate(start.getDate() - 30);
+    else if (p === "6m") start.setMonth(start.getMonth() - 6);
+    else if (p === "1y") start.setFullYear(start.getFullYear() - 1);
+    return { from: fmtDate(start), to: "" };
+  }
+  const { from: dateMin, to: dateMax } = presetRange(preset);
+
+  // datas chegam como "YYYY-MM-DD" — comparação lexicográfica é segura
+  const arts = (ent.articles || []).filter((a) => {
+    if (q && !`${a.title} ${a.source}`.toLowerCase().includes(q)) return false;
+    if (dateMin && (!a.date || a.date < dateMin)) return false;
+    if (dateMax && (!a.date || a.date > dateMax)) return false;
+    return true;
+  });
 
   return (
     <div className="page">
@@ -726,12 +753,42 @@ function PageMonitoramento() {
           <input className="input" placeholder="Filtrar nesta lista…" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
 
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>Período:</span>
+          <select className="input" style={{ width: "auto" }}
+            value={preset} onChange={(e) => setPreset(e.target.value)}>
+            <option value="all">Todos os tempos</option>
+            <option value="30d">Últimos 30 dias</option>
+            <option value="6m">Últimos 6 meses</option>
+            <option value="1y">Último ano</option>
+            <option value="custom">Personalizado</option>
+          </select>
+          {preset === "custom" && (
+            <>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-muted)" }}>
+                De
+                <input type="date" className="input" style={{ width: "auto" }}
+                  min={minDate} max={maxDate} value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)} />
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-muted)" }}>
+                até
+                <input type="date" className="input" style={{ width: "auto" }}
+                  min={minDate} max={maxDate} value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)} />
+              </label>
+            </>
+          )}
+        </div>
+
         <div className="pager-info" style={{ marginBottom: 12 }}>
           {arts.length} notícia(s){ent.keywords && ent.keywords.length ? ` · termos: ${ent.keywords.join(", ")}` : ""}
         </div>
 
         {arts.length === 0 ? (
-          <div className="empty-hint">Nenhuma notícia encontrada para este ator ainda. Rode o pipeline para coletar.</div>
+          <div className="empty-hint">{(q || dateMin || dateMax)
+            ? "Nenhuma notícia corresponde aos filtros aplicados."
+            : "Nenhuma notícia encontrada para este ator ainda. Rode o pipeline para coletar."}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {arts.map((a, i) => (
